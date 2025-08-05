@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,60 +8,77 @@ import { ProductForm } from "@/components/ProductForm";
 import { SearchBar } from "@/components/SearchBar";
 import { StockAlerts } from "@/components/StockAlerts";
 import { Product } from "@/types/product";
-import { Plus, Package2, TrendingUp, AlertTriangle, BarChart3 } from "lucide-react";
+import { Plus, Package2, TrendingUp, AlertTriangle, BarChart3, Wifi, WifiOff } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { localStorageUtils } from "@/utils/localStorage";
+import { useOfflineStatus } from "@/hooks/useOfflineStatus";
 
 const Index = () => {
-  const [products, setProducts] = useState<Product[]>([
-    {
-      id: '1',
-      nameAr: 'هاتف ذكي سامسونج غالكسي',
-      category: '1',
-      quantity: 15,
-      price: 2500,
-      supplier: 'شركة التقنية المتقدمة',
-      image: '',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      minStock: 5,
-    },
-    {
-      id: '2',
-      nameAr: 'قميص قطني أزرق',
-      category: '2',
-      quantity: 0,
-      price: 150,
-      supplier: 'مصنع النسيج الحديث',
-      image: '',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      minStock: 10,
-    },
-    {
-      id: '3',
-      nameAr: 'قهوة عربية فاخرة',
-      category: '3',
-      quantity: 3,
-      price: 85,
-      supplier: 'مزارع القهوة العربية',
-      image: '',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      minStock: 20,
-    },
-    {
-      id: '4',
-      nameAr: 'مكتب خشبي حديث',
-      category: '4',
-      quantity: 8,
-      price: 1200,
-      supplier: 'معرض الأثاث المميز',
-      image: '',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      minStock: 3,
+  const isOnline = useOfflineStatus();
+  
+  // Initialize products from localStorage or default data
+  const [products, setProducts] = useState<Product[]>(() => {
+    const savedProducts = localStorageUtils.loadProducts();
+    if (savedProducts.length > 0) {
+      return savedProducts;
     }
-  ]);
+    // Default products if no saved data
+    return [
+      {
+        id: '1',
+        nameAr: 'هاتف ذكي سامسونج غالكسي',
+        category: '1',
+        quantity: 15,
+        price: 2500,
+        supplier: 'شركة التقنية المتقدمة',
+        image: '',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        minStock: 5,
+      },
+      {
+        id: '2',
+        nameAr: 'قميص قطني أزرق',
+        category: '2',
+        quantity: 0,
+        price: 150,
+        supplier: 'مصنع النسيج الحديث',
+        image: '',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        minStock: 10,
+      },
+      {
+        id: '3',
+        nameAr: 'قهوة عربية فاخرة',
+        category: '3',
+        quantity: 3,
+        price: 85,
+        supplier: 'مزارع القهوة العربية',
+        image: '',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        minStock: 20,
+      },
+      {
+        id: '4',
+        nameAr: 'مكتب خشبي حديث',
+        category: '4',
+        quantity: 8,
+        price: 1200,
+        supplier: 'معرض الأثاث المميز',
+        image: '',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        minStock: 3,
+      }
+    ];
+  });
+
+  // Save products to localStorage whenever products change
+  useEffect(() => {
+    localStorageUtils.saveProducts(products);
+  }, [products]);
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | undefined>();
@@ -149,14 +166,26 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background" dir="rtl">
       <div className="container mx-auto p-4 space-y-6">
-        {/* Header */}
+        {/* Header with Offline Status */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground arabic-text">
-              نظام إدارة المخزون
-            </h1>
+            <div className="flex items-center gap-2 mb-2">
+              <h1 className="text-3xl font-bold text-foreground arabic-text">
+                نظام إدارة المخزون
+              </h1>
+              <div className="flex items-center gap-1">
+                {isOnline ? (
+                  <Wifi className="w-5 h-5 text-success" />
+                ) : (
+                  <WifiOff className="w-5 h-5 text-destructive" />
+                )}
+                <Badge variant={isOnline ? "default" : "destructive"} className="text-xs">
+                  {isOnline ? "متصل" : "غير متصل"}
+                </Badge>
+              </div>
+            </div>
             <p className="text-muted-foreground">
-              إدارة وتتبع منتجاتك بسهولة
+              إدارة وتتبع منتجاتك بسهولة {!isOnline && "(وضع عدم الاتصال)"}
             </p>
           </div>
           <Button onClick={openAddForm} className="bg-gradient-primary border-0 shadow-medium">
