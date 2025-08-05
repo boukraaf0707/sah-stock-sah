@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { MissingItemCard } from "@/components/MissingItemCard";
 import { MissingItem, MissingItemForm } from "@/types/missing";
 import { Product } from "@/types/product";
-import { Plus, Search, Download, Filter } from "lucide-react";
+import { Plus, Search, Download, Filter, Printer } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 // Mock data for missing items
@@ -176,6 +176,213 @@ const MissingItems = ({ products }: MissingItemsProps) => {
     });
   };
 
+  const handlePrint = () => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    const getProductImage = (item: MissingItem) => {
+      const product = products.find(p => p.id === item.productId);
+      return product?.image || '';
+    };
+
+    const printContent = `
+      <!DOCTYPE html>
+      <html dir="rtl">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>تقرير الأصناف المفقودة</title>
+        <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            direction: rtl; 
+            text-align: right; 
+            padding: 20px; 
+            background: white;
+          }
+          .header { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            padding-bottom: 20px; 
+            border-bottom: 2px solid #ccc; 
+          }
+          .header h1 { 
+            font-size: 28px; 
+            color: #333; 
+            margin-bottom: 10px; 
+          }
+          .header p { 
+            color: #666; 
+            font-size: 14px; 
+          }
+          .stats { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 15px; 
+            margin-bottom: 30px; 
+          }
+          .stat-card { 
+            padding: 15px; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            text-align: center; 
+          }
+          .stat-card h3 { 
+            font-size: 12px; 
+            color: #666; 
+            margin-bottom: 5px; 
+          }
+          .stat-card .number { 
+            font-size: 24px; 
+            font-weight: bold; 
+            color: #333; 
+          }
+          .items-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 20px; 
+          }
+          .item-card { 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            padding: 15px; 
+            background: #f9f9f9; 
+          }
+          .item-header { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            margin-bottom: 15px; 
+          }
+          .item-image { 
+            width: 60px; 
+            height: 60px; 
+            border-radius: 8px; 
+            object-fit: cover; 
+            border: 1px solid #ddd; 
+          }
+          .item-placeholder { 
+            width: 60px; 
+            height: 60px; 
+            border-radius: 8px; 
+            background: #e0e0e0; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 20px; 
+            color: #666; 
+            border: 1px solid #ddd; 
+          }
+          .item-info h3 { 
+            font-size: 16px; 
+            color: #333; 
+            margin-bottom: 5px; 
+          }
+          .item-details { 
+            font-size: 12px; 
+            color: #666; 
+          }
+          .item-details div { 
+            margin-bottom: 5px; 
+          }
+          .priority { 
+            display: inline-block; 
+            padding: 3px 8px; 
+            border-radius: 4px; 
+            font-size: 10px; 
+            font-weight: bold; 
+          }
+          .priority.urgent { background: #fee; color: #c00; }
+          .priority.high { background: #fef0e6; color: #d46b08; }
+          .priority.medium { background: #f6ffed; color: #52c41a; }
+          .priority.low { background: #f0f5ff; color: #1890ff; }
+          @media print {
+            body { margin: 0; }
+            .item-card { break-inside: avoid; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>تقرير الأصناف المفقودة</h1>
+          <p>تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}</p>
+        </div>
+        
+        <div class="stats">
+          <div class="stat-card">
+            <h3>إجمالي المفقودات</h3>
+            <div class="number">${stats.total}</div>
+          </div>
+          <div class="stat-card">
+            <h3>غير محلولة</h3>
+            <div class="number">${stats.unresolved}</div>
+          </div>
+          <div class="stat-card">
+            <h3>عاجلة</h3>
+            <div class="number">${stats.urgent}</div>
+          </div>
+          <div class="stat-card">
+            <h3>مكتشفة تلقائياً</h3>
+            <div class="number">${stats.autoDetected}</div>
+          </div>
+        </div>
+        
+        <div class="items-grid">
+          ${filteredItems.map(item => {
+            const image = getProductImage(item);
+            const priorityLabels: Record<string, string> = {
+              urgent: 'عاجلة',
+              high: 'عالية', 
+              medium: 'متوسطة',
+              low: 'منخفضة'
+            };
+            const reasonLabels: Record<string, string> = {
+              out_of_stock: 'نفاد المخزون',
+              damaged: 'تالف',
+              lost: 'مفقود',
+              other: 'أخرى'
+            };
+            
+            return `
+              <div class="item-card">
+                <div class="item-header">
+                  ${image ? 
+                    `<img src="${image}" alt="${item.nameAr}" class="item-image" />` :
+                    `<div class="item-placeholder">${item.nameAr.charAt(0)}</div>`
+                  }
+                  <div class="item-info">
+                    <h3>${item.nameAr}</h3>
+                    <span class="priority ${item.priority}">${priorityLabels[item.priority] || item.priority}</span>
+                  </div>
+                </div>
+                <div class="item-details">
+                  <div><strong>السبب:</strong> ${reasonLabels[item.reason] || item.reason}</div>
+                  ${item.estimatedPrice ? `<div><strong>السعر المقدر:</strong> ${item.estimatedPrice.toLocaleString('en-US')} DZD</div>` : ''}
+                  ${item.supplier ? `<div><strong>المورد:</strong> ${item.supplier}</div>` : ''}
+                  <div><strong>تاريخ الاكتشاف:</strong> ${item.detectedAt.toLocaleDateString('ar-SA')}</div>
+                  ${item.description ? `<div><strong>الوصف:</strong> ${item.description}</div>` : ''}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+
+    toast({
+      title: "جاري الطباعة",
+      description: "تم فتح نافذة الطباعة",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background" dir="rtl">
       <div className="container mx-auto p-4 space-y-6">
@@ -190,6 +397,10 @@ const MissingItems = ({ products }: MissingItemsProps) => {
             </p>
           </div>
           <div className="flex gap-2">
+            <Button onClick={handlePrint} variant="outline">
+              <Printer className="w-4 h-4 ml-2" />
+              طباعة
+            </Button>
             <Button onClick={exportReport} variant="outline">
               <Download className="w-4 h-4 ml-2" />
               تصدير التقرير
