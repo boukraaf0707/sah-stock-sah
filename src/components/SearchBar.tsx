@@ -37,7 +37,7 @@ export function SearchBar({
 
       {/* Category Filter */}
       <div className="sm:w-48">
-        <Select value={selectedCategory} onValueChange={onCategoryChange}>
+        <Select value={selectedCategory || "all"} onValueChange={(value) => onCategoryChange(value === "all" ? "" : value)}>
           <SelectTrigger className="text-right" dir="rtl">
             <div className="flex items-center">
               <Filter className="w-4 h-4 ml-2" />
@@ -45,7 +45,7 @@ export function SearchBar({
             </div>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">جميع الفئات</SelectItem>
+            <SelectItem value="all">جميع الفئات</SelectItem>
             {CATEGORIES.map((category) => (
               <SelectItem key={category.id} value={category.id}>
                 {category.nameAr}
