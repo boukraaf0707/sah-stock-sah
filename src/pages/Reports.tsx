@@ -271,17 +271,52 @@ const Reports = ({ products, missingItems, sales, onImportData }: ReportsProps) 
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Button variant="outline" className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2"
+                onClick={() => {
+                  const monthlyData = {
+                    sales: stats.sales.thisMonthSales,
+                    revenue: stats.sales.thisMonthRevenue,
+                    growth: stats.sales.salesGrowth
+                  };
+                  alert(`التقرير الشهري:\nالمبيعات: ${monthlyData.sales}\nالإيرادات: ${monthlyData.revenue.toLocaleString('en-US')} DZD\nالنمو: ${monthlyData.growth.toFixed(1)}%`);
+                }}
+              >
                 <Calendar className="w-4 h-4" />
                 تقرير شهري
               </Button>
               
-              <Button variant="outline" className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2"
+                onClick={() => {
+                  const performanceData = {
+                    totalProducts: stats.inventory.totalProducts,
+                    inventoryValue: stats.inventory.totalValue,
+                    stockIssues: stats.inventory.outOfStock + stats.inventory.lowStock,
+                    salesTotal: stats.sales.totalSales
+                  };
+                  alert(`تحليل الأداء:\nإجمالي المنتجات: ${performanceData.totalProducts}\nقيمة المخزون: ${performanceData.inventoryValue.toLocaleString('en-US')} DZD\nمشاكل المخزون: ${performanceData.stockIssues}\nإجمالي المبيعات: ${performanceData.salesTotal}`);
+                }}
+              >
                 <BarChart3 className="w-4 h-4" />
                 تحليل الأداء
               </Button>
               
-              <Button variant="outline" className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2"
+                onClick={() => {
+                  const salesData = {
+                    totalSales: stats.sales.totalSales,
+                    totalRevenue: stats.sales.totalRevenue,
+                    thisMonth: stats.sales.thisMonthRevenue,
+                    avgSale: stats.sales.totalSales > 0 ? (stats.sales.totalRevenue / stats.sales.totalSales) : 0
+                  };
+                  alert(`تقرير المبيعات:\nإجمالي المبيعات: ${salesData.totalSales}\nإجمالي الإيرادات: ${salesData.totalRevenue.toLocaleString('en-US')} DZD\nإيرادات الشهر: ${salesData.thisMonth.toLocaleString('en-US')} DZD\nمتوسط البيع: ${salesData.avgSale.toLocaleString('en-US')} DZD`);
+                }}
+              >
                 <DollarSign className="w-4 h-4" />
                 تقرير المبيعات
               </Button>
