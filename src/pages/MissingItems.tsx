@@ -6,7 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MissingItemCard } from "@/components/MissingItemCard";
-import { MissingItem, MissingItemForm } from "@/types/missing";
+import { MissingItemFormComponent } from "@/components/MissingItemForm";
+import { MissingItem, MissingItemForm as MissingItemFormType } from "@/types/missing";
 import { Product } from "@/types/product";
 import { Plus, Search, Download, Filter, Printer } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -22,6 +23,7 @@ const MissingItems = ({ products }: MissingItemsProps) => {
   const [selectedPriority, setSelectedPriority] = useState('');
   const [selectedReason, setSelectedReason] = useState('');
   const [activeTab, setActiveTab] = useState('all');
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   // Auto-detect out of stock items
   useEffect(() => {
@@ -117,6 +119,30 @@ const MissingItems = ({ products }: MissingItemsProps) => {
     toast({
       title: "تم حل المشكلة",
       description: "تم وضع علامة حل على الصنف المفقود",
+    });
+  };
+
+  const handleAddMissingItem = (formData: MissingItemFormType) => {
+    const newMissingItem: MissingItem = {
+      id: `manual-${Date.now()}`,
+      productId: undefined,
+      nameAr: formData.nameAr,
+      nameEn: formData.nameEn,
+      category: formData.category,
+      priority: formData.priority,
+      reason: formData.reason,
+      description: formData.description,
+      supplier: formData.supplier,
+      estimatedPrice: formData.estimatedPrice,
+      image: formData.image,
+      detectedAt: new Date(),
+      isResolved: false
+    };
+
+    setMissingItems(prev => [...prev, newMissingItem]);
+    toast({
+      title: "تم إضافة الصنف المفقود",
+      description: "تم إضافة الصنف إلى قائمة المفقودات بنجاح",
     });
   };
 
@@ -378,7 +404,7 @@ const MissingItems = ({ products }: MissingItemsProps) => {
               <Download className="w-4 h-4 ml-2" />
               تصدير التقرير
             </Button>
-            <Button className="bg-gradient-primary">
+            <Button onClick={() => setIsFormOpen(true)} className="bg-gradient-primary">
               <Plus className="w-4 h-4 ml-2" />
               إضافة صنف مفقود
             </Button>
@@ -533,6 +559,13 @@ const MissingItems = ({ products }: MissingItemsProps) => {
             )}
           </TabsContent>
         </Tabs>
+
+        {/* Missing Item Form */}
+        <MissingItemFormComponent
+          isOpen={isFormOpen}
+          onClose={() => setIsFormOpen(false)}
+          onSubmit={handleAddMissingItem}
+        />
       </div>
     </div>
   );
