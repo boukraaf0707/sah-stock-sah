@@ -155,7 +155,7 @@ const Index = ({ products, onUpdateProducts }: IndexProps) => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-right">
-                {stats.totalValue.toLocaleString('ar-SA')} ر.س
+                {stats.totalValue.toLocaleString('en-US')} ر.س
               </div>
             </CardContent>
           </Card>
