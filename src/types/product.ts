@@ -20,10 +20,14 @@ export interface Category {
 }
 
 export const CATEGORIES: Category[] = [
-  { id: '1', nameAr: 'إلكترونيات', nameEn: 'Electronics', color: 'blue' },
-  { id: '2', nameAr: 'ملابس', nameEn: 'Clothing', color: 'purple' },
-  { id: '3', nameAr: 'طعام ومشروبات', nameEn: 'Food & Beverages', color: 'green' },
-  { id: '4', nameAr: 'أدوات منزلية', nameEn: 'Home & Garden', color: 'orange' },
-  { id: '5', nameAr: 'كتب وقرطاسية', nameEn: 'Books & Stationery', color: 'indigo' },
-  { id: '6', nameAr: 'صحة وجمال', nameEn: 'Health & Beauty', color: 'pink' },
+  { id: '1', nameAr: 'ضواغط التبريد', nameEn: 'Compressors', color: 'blue' },
+  { id: '2', nameAr: 'غازات التبريد', nameEn: 'Refrigerants', color: 'cyan' },
+  { id: '3', nameAr: 'أدوات السباكة', nameEn: 'Plumbing Tools', color: 'green' },
+  { id: '4', nameAr: 'أدوات كهربائية', nameEn: 'Electrical Tools', color: 'yellow' },
+  { id: '5', nameAr: 'مواسير ووصلات', nameEn: 'Pipes & Fittings', color: 'orange' },
+  { id: '6', nameAr: 'أجهزة قياس', nameEn: 'Measuring Instruments', color: 'purple' },
+  { id: '7', nameAr: 'قطع غيار تبريد', nameEn: 'HVAC Parts', color: 'indigo' },
+  { id: '8', nameAr: 'عدد يدوية', nameEn: 'Hand Tools', color: 'gray' },
+  { id: '9', nameAr: 'مواد عازلة', nameEn: 'Insulation Materials', color: 'teal' },
+  { id: '10', nameAr: 'كابلات ومفاتيح', nameEn: 'Cables & Switches', color: 'red' },
 ];
