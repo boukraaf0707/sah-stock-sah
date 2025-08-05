@@ -199,7 +199,7 @@ export const MissingItemFormComponent = ({
               type="url"
               value={formData.image}
               onChange={(e) => setFormData(prev => ({ ...prev, image: e.target.value }))}
-              placeholder="https://example.com/image.jpg"
+              placeholder="رابط الصورة (اختياري)"
             />
           </div>
 

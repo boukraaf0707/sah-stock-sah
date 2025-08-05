@@ -11,40 +11,13 @@ import { Product } from "@/types/product";
 import { Plus, Search, Download, Filter, Printer } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
-// Mock data for missing items
-const mockMissingItems: MissingItem[] = [
-  {
-    id: '1',
-    productId: '2',
-    nameAr: 'قميص قطني أزرق',
-    category: '2',
-    priority: 'high',
-    reason: 'out_of_stock',
-    description: 'نفد المخزون بالكامل، يحتاج إعادة طلب',
-    supplier: 'مصنع النسيج الحديث',
-    estimatedPrice: 150,
-    detectedAt: new Date('2024-01-15'),
-    isResolved: false
-  },
-  {
-    id: '2',
-    nameAr: 'مكتب خشبي فاخر',
-    category: '4',
-    priority: 'medium',
-    reason: 'damaged',
-    description: 'تلف أثناء النقل',
-    estimatedPrice: 2000,
-    detectedAt: new Date('2024-01-10'),
-    isResolved: false
-  }
-];
 
 interface MissingItemsProps {
   products: Product[];
 }
 
 const MissingItems = ({ products }: MissingItemsProps) => {
-  const [missingItems, setMissingItems] = useState<MissingItem[]>(mockMissingItems);
+  const [missingItems, setMissingItems] = useState<MissingItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPriority, setSelectedPriority] = useState('');
   const [selectedReason, setSelectedReason] = useState('');

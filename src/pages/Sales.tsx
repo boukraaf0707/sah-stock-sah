@@ -9,42 +9,6 @@ import { Sale, SaleForm, PAYMENT_METHOD_LABELS } from "@/types/sale";
 import { Plus, Search, TrendingUp, ShoppingCart, Calendar, DollarSign } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
-// Mock sales data
-const mockSales: Sale[] = [
-  {
-    id: '1',
-    items: [
-      {
-        productId: '1',
-        productName: 'هاتف ذكي سامسونج غالكسي',
-        quantity: 1,
-        unitPrice: 2500,
-        totalPrice: 2500
-      }
-    ],
-    totalAmount: 2500,
-    customerName: 'أحمد محمد',
-    customerPhone: '0501234567',
-    paymentMethod: 'card',
-    notes: 'عميل مميز',
-    createdAt: new Date('2024-01-15T10:30:00')
-  },
-  {
-    id: '2',
-    items: [
-      {
-        productId: '3',
-        productName: 'قهوة عربية فاخرة',
-        quantity: 2,
-        unitPrice: 85,
-        totalPrice: 170
-      }
-    ],
-    totalAmount: 170,
-    paymentMethod: 'cash',
-    createdAt: new Date('2024-01-15T14:20:00')
-  }
-];
 
 interface SalesProps {
   products: Product[];
@@ -52,7 +16,7 @@ interface SalesProps {
 }
 
 const Sales = ({ products, onUpdateProducts }: SalesProps) => {
-  const [sales, setSales] = useState<Sale[]>(mockSales);
+  const [sales, setSales] = useState<Sale[]>([]);
   const [isSalesFormOpen, setIsSalesFormOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
