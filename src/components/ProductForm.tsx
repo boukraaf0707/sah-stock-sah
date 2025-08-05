@@ -107,7 +107,7 @@ export function ProductForm({ isOpen, onClose, onSubmit, product, title }: Produ
             </div>
             <div>
               <Label htmlFor="price" className="text-right block mb-2">
-                السعر (ر.س) *
+                السعر (DZD) *
               </Label>
               <Input
                 id="price"

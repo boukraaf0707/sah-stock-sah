@@ -173,7 +173,7 @@ export const SalesForm = ({ isOpen, onClose, onSubmit, products }: SalesFormProp
                       className="w-full justify-between text-right"
                       onClick={() => addItem(product)}
                     >
-                      <span>{product.nameAr} - {product.price} ر.س</span>
+                      <span>{product.nameAr} - {product.price.toLocaleString('en-US')} DZD</span>
                       <span className="text-sm text-muted-foreground">
                         متوفر: {product.quantity}
                       </span>
@@ -206,7 +206,7 @@ export const SalesForm = ({ isOpen, onClose, onSubmit, products }: SalesFormProp
                       <div className="flex-1 text-right">
                         <div className="font-medium">{item.productName}</div>
                         <div className="text-sm text-muted-foreground">
-                          {item.unitPrice} ر.س × {item.quantity} = {item.totalPrice} ر.س
+                          {item.unitPrice.toLocaleString('en-US')} DZD × {item.quantity} = {item.totalPrice.toLocaleString('en-US')} DZD
                         </div>
                       </div>
                       
@@ -242,7 +242,7 @@ export const SalesForm = ({ isOpen, onClose, onSubmit, products }: SalesFormProp
                   
                   <div className="border-t pt-2 mt-4">
                     <div className="text-lg font-bold text-right">
-                      المجموع: {totalAmount.toLocaleString('ar-SA')} ر.س
+                      المجموع: {totalAmount.toLocaleString('en-US')} DZD
                     </div>
                   </div>
                 </div>
@@ -307,7 +307,7 @@ export const SalesForm = ({ isOpen, onClose, onSubmit, products }: SalesFormProp
 
           <div className="flex gap-2 pt-4">
             <Button type="submit" className="flex-1" disabled={formData.items.length === 0}>
-              إتمام البيع ({totalAmount.toLocaleString('ar-SA')} ر.س)
+              إتمام البيع ({totalAmount.toLocaleString('en-US')} DZD)
             </Button>
             <Button type="button" variant="outline" onClick={handleClose}>
               إلغاء

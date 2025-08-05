@@ -138,7 +138,7 @@ const Reports = ({ products, missingItems, sales, onImportData }: ReportsProps) 
             <CardContent>
               <div className="text-2xl font-bold text-right">{stats.inventory.totalProducts}</div>
               <p className="text-xs text-muted-foreground text-right">
-                قيمة: {stats.inventory.totalValue.toLocaleString('ar-SA')} ر.س
+                قيمة: {stats.inventory.totalValue.toLocaleString('en-US')} DZD
               </p>
             </CardContent>
           </Card>
@@ -151,7 +151,7 @@ const Reports = ({ products, missingItems, sales, onImportData }: ReportsProps) 
             <CardContent>
               <div className="text-2xl font-bold text-right">{stats.sales.totalSales}</div>
               <p className="text-xs text-muted-foreground text-right">
-                إيرادات: {stats.sales.totalRevenue.toLocaleString('ar-SA')} ر.س
+                إيرادات: {stats.sales.totalRevenue.toLocaleString('en-US')} DZD
               </p>
             </CardContent>
           </Card>
@@ -206,7 +206,7 @@ const Reports = ({ products, missingItems, sales, onImportData }: ReportsProps) 
               
               <div className="text-center">
                 <div className="text-2xl font-bold">
-                  {stats.sales.thisMonthRevenue.toLocaleString('ar-SA')} ر.س
+                  {stats.sales.thisMonthRevenue.toLocaleString('en-US')} DZD
                 </div>
                 <div className="text-sm text-muted-foreground">إيرادات هذا الشهر</div>
               </div>
@@ -244,7 +244,7 @@ const Reports = ({ products, missingItems, sales, onImportData }: ReportsProps) 
                     <div className="text-right">
                       <div className="font-medium">{categoryName}</div>
                       <div className="text-sm text-muted-foreground">
-                        {data.count} منتج • {data.value.toLocaleString('ar-SA')} ر.س
+                        {data.count} منتج • {data.value.toLocaleString('en-US')} DZD
                       </div>
                     </div>
                     <div className="flex gap-2">

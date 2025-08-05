@@ -69,7 +69,7 @@ export const MissingItemCard = ({ item, onEdit, onDelete, onResolve }: MissingIt
         {item.estimatedPrice && (
           <div className="text-sm text-right">
             <span className="text-muted-foreground">السعر المتوقع: </span>
-            <span className="font-medium">{item.estimatedPrice.toLocaleString('ar-SA')} ر.س</span>
+            <span className="font-medium">{item.estimatedPrice.toLocaleString('en-US')} DZD</span>
           </div>
         )}
 

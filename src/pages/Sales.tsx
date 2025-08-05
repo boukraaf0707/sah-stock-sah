@@ -111,7 +111,7 @@ const Sales = ({ products, onUpdateProducts }: SalesProps) => {
 
     toast({
       title: "تم إنشاء عملية البيع بنجاح",
-      description: `إجمالي المبلغ: ${newSale.totalAmount.toLocaleString('ar-SA')} ر.س`,
+      description: `إجمالي المبلغ: ${newSale.totalAmount.toLocaleString('en-US')} DZD`,
     });
   };
 
@@ -156,7 +156,7 @@ const Sales = ({ products, onUpdateProducts }: SalesProps) => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-right">
-                {stats.totalRevenue.toLocaleString('ar-SA')} ر.س
+                {stats.totalRevenue.toLocaleString('en-US')} DZD
               </div>
             </CardContent>
           </Card>
@@ -178,7 +178,7 @@ const Sales = ({ products, onUpdateProducts }: SalesProps) => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-right">
-                {stats.todayRevenue.toLocaleString('ar-SA')} ر.س
+                {stats.todayRevenue.toLocaleString('en-US')} DZD
               </div>
             </CardContent>
           </Card>
@@ -233,7 +233,7 @@ const Sales = ({ products, onUpdateProducts }: SalesProps) => {
                         </div>
                         <div className="text-left">
                           <div className="text-lg font-bold">
-                            {sale.totalAmount.toLocaleString('ar-SA')} ر.س
+                            {sale.totalAmount.toLocaleString('en-US')} DZD
                           </div>
                           <Badge variant="default">
                             {PAYMENT_METHOD_LABELS[sale.paymentMethod]}
@@ -253,7 +253,7 @@ const Sales = ({ products, onUpdateProducts }: SalesProps) => {
                           <div key={index} className="flex justify-between text-sm">
                             <span>{item.productName}</span>
                             <span>
-                              {item.quantity} × {item.unitPrice} = {item.totalPrice} ر.س
+                              {item.quantity} × {item.unitPrice.toLocaleString('en-US')} = {item.totalPrice.toLocaleString('en-US')} DZD
                             </span>
                           </div>
                         ))}

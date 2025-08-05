@@ -166,7 +166,7 @@ export const MissingItemFormComponent = ({
             </div>
 
             <div>
-              <Label htmlFor="estimatedPrice">السعر المتوقع (ر.س)</Label>
+              <Label htmlFor="estimatedPrice">السعر المتوقع (DZD)</Label>
               <Input
                 id="estimatedPrice"
                 type="number"

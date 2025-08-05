@@ -77,7 +77,7 @@ export function ProductCard({ product, onEdit, onDelete, dir = "rtl" }: ProductC
 
           <div className="flex items-center justify-between">
             <span className="font-bold text-primary text-lg">
-              {product.price.toLocaleString('ar-SA')} ر.س
+              {product.price.toLocaleString('en-US')} DZD
             </span>
             {product.supplier && (
               <span className="text-xs text-muted-foreground">
