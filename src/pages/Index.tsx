@@ -10,75 +10,15 @@ import { StockAlerts } from "@/components/StockAlerts";
 import { Product } from "@/types/product";
 import { Plus, Package2, TrendingUp, AlertTriangle, BarChart3, Wifi, WifiOff } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { localStorageUtils } from "@/utils/localStorage";
 import { useOfflineStatus } from "@/hooks/useOfflineStatus";
 
-const Index = () => {
-  const isOnline = useOfflineStatus();
-  
-  // Initialize products from localStorage or default data
-  const [products, setProducts] = useState<Product[]>(() => {
-    const savedProducts = localStorageUtils.loadProducts();
-    if (savedProducts.length > 0) {
-      return savedProducts;
-    }
-    // Default products if no saved data
-    return [
-      {
-        id: '1',
-        nameAr: 'هاتف ذكي سامسونج غالكسي',
-        category: '1',
-        quantity: 15,
-        price: 2500,
-        supplier: 'شركة التقنية المتقدمة',
-        image: '',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        minStock: 5,
-      },
-      {
-        id: '2',
-        nameAr: 'قميص قطني أزرق',
-        category: '2',
-        quantity: 0,
-        price: 150,
-        supplier: 'مصنع النسيج الحديث',
-        image: '',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        minStock: 10,
-      },
-      {
-        id: '3',
-        nameAr: 'قهوة عربية فاخرة',
-        category: '3',
-        quantity: 3,
-        price: 85,
-        supplier: 'مزارع القهوة العربية',
-        image: '',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        minStock: 20,
-      },
-      {
-        id: '4',
-        nameAr: 'مكتب خشبي حديث',
-        category: '4',
-        quantity: 8,
-        price: 1200,
-        supplier: 'معرض الأثاث المميز',
-        image: '',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        minStock: 3,
-      }
-    ];
-  });
+interface IndexProps {
+  products: Product[];
+  onUpdateProducts: (products: Product[]) => void;
+}
 
-  // Save products to localStorage whenever products change
-  useEffect(() => {
-    localStorageUtils.saveProducts(products);
-  }, [products]);
+const Index = ({ products, onUpdateProducts }: IndexProps) => {
+  const isOnline = useOfflineStatus();
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | undefined>();
@@ -111,7 +51,7 @@ const Index = () => {
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    setProducts(prev => [...prev, newProduct]);
+    onUpdateProducts([...products, newProduct]);
     toast({
       title: "تم إضافة المنتج بنجاح",
       description: `تم إضافة ${productData.nameAr} إلى المخزون`,
@@ -121,11 +61,12 @@ const Index = () => {
   const handleEditProduct = (productData: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
     if (!editingProduct) return;
     
-    setProducts(prev => prev.map(p => 
+    const updatedProducts = products.map(p => 
       p.id === editingProduct.id 
         ? { ...productData, id: p.id, createdAt: p.createdAt, updatedAt: new Date() }
         : p
-    ));
+    );
+    onUpdateProducts(updatedProducts);
     setEditingProduct(undefined);
     toast({
       title: "تم تحديث المنتج بنجاح",
@@ -135,7 +76,8 @@ const Index = () => {
 
   const handleDeleteProduct = (id: string) => {
     const product = products.find(p => p.id === id);
-    setProducts(prev => prev.filter(p => p.id !== id));
+    const updatedProducts = products.filter(p => p.id !== id);
+    onUpdateProducts(updatedProducts);
     toast({
       title: "تم حذف المنتج",
       description: `تم حذف ${product?.nameAr || 'المنتج'} من المخزون`,
