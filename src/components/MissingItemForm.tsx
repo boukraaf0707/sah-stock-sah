@@ -193,14 +193,33 @@ export const MissingItemFormComponent = ({
           </div>
 
           <div>
-            <Label htmlFor="image">رابط الصورة</Label>
+            <Label htmlFor="image">صورة الصنف</Label>
             <Input
               id="image"
-              type="url"
-              value={formData.image}
-              onChange={(e) => setFormData(prev => ({ ...prev, image: e.target.value }))}
-              placeholder="رابط الصورة (اختياري)"
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onload = (event) => {
+                    const base64 = event.target?.result as string;
+                    setFormData(prev => ({ ...prev, image: base64 }));
+                  };
+                  reader.readAsDataURL(file);
+                }
+              }}
+              className="file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
             />
+            {formData.image && (
+              <div className="mt-2">
+                <img 
+                  src={formData.image} 
+                  alt="معاينة الصورة" 
+                  className="w-20 h-20 object-cover rounded border"
+                />
+              </div>
+            )}
           </div>
 
           <div>
