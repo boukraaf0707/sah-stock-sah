@@ -74,7 +74,7 @@ export const MissingItemCard = ({ item, onEdit, onDelete, onResolve }: MissingIt
         )}
 
         <div className="text-xs text-muted-foreground text-right">
-          تم الكشف في: {item.detectedAt.toLocaleDateString('ar-SA')}
+          تم الكشف في: {item.detectedAt.toLocaleDateString('en-US')}
         </div>
 
         <div className="flex gap-2 pt-2">
@@ -109,7 +109,7 @@ export const MissingItemCard = ({ item, onEdit, onDelete, onResolve }: MissingIt
           <div className="flex items-center gap-2 p-2 bg-success/10 rounded-md">
             <CheckCircle className="w-4 h-4 text-success" />
             <span className="text-sm text-success">
-              تم الحل في {item.resolvedAt.toLocaleDateString('ar-SA')}
+              تم الحل في {item.resolvedAt.toLocaleDateString('en-US')}
             </span>
           </div>
         )}

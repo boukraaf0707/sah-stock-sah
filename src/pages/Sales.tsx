@@ -271,7 +271,7 @@ const Sales = ({ products, onUpdateProducts }: SalesProps) => {
                             عملية بيع #{sale.id}
                           </div>
                           <div className="text-sm text-muted-foreground">
-                            {sale.createdAt.toLocaleDateString('ar-SA', {
+                            {sale.createdAt.toLocaleDateString('en-US', {
                               year: 'numeric',
                               month: 'long',
                               day: 'numeric',

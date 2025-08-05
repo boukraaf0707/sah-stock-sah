@@ -306,7 +306,7 @@ const MissingItems = ({ products }: MissingItemsProps) => {
       <body>
         <div class="header">
           <h1>تقرير الأصناف المفقودة</h1>
-          <p>تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}</p>
+          <p>تاريخ الطباعة: ${new Date().toLocaleDateString('en-US')}</p>
         </div>
         
         <div class="stats">
@@ -360,7 +360,7 @@ const MissingItems = ({ products }: MissingItemsProps) => {
                   <div><strong>السبب:</strong> ${reasonLabels[item.reason] || item.reason}</div>
                   ${item.estimatedPrice ? `<div><strong>السعر المقدر:</strong> ${item.estimatedPrice.toLocaleString('en-US')} DZD</div>` : ''}
                   ${item.supplier ? `<div><strong>المورد:</strong> ${item.supplier}</div>` : ''}
-                  <div><strong>تاريخ الاكتشاف:</strong> ${item.detectedAt.toLocaleDateString('ar-SA')}</div>
+                  <div><strong>تاريخ الاكتشاف:</strong> ${item.detectedAt.toLocaleDateString('en-US')}</div>
                   ${item.description ? `<div><strong>الوصف:</strong> ${item.description}</div>` : ''}
                 </div>
               </div>
