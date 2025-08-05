@@ -287,26 +287,6 @@ const Sales = ({ products, onUpdateProducts }: SalesProps) => {
           </CardContent>
         </Card>
 
-        {/* Search Sales */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Search className="w-5 h-5" />
-              البحث في المبيعات
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="relative max-w-md">
-              <Search className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="البحث بالعميل أو المنتج..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pr-10"
-              />
-            </div>
-          </CardContent>
-        </Card>
         <Card>
           <CardHeader>
             <CardTitle>سجل المبيعات</CardTitle>
