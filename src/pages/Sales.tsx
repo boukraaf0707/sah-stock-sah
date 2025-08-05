@@ -201,6 +201,55 @@ const Sales = ({ products, onUpdateProducts }: SalesProps) => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pr-10"
               />
+              
+              {/* Autocomplete Suggestions */}
+              {searchTerm && (
+                <div className="absolute top-full left-0 right-0 z-50 mt-1 max-h-60 overflow-y-auto bg-popover border rounded-md shadow-lg">
+                  {products
+                    .filter(product => 
+                      product.nameAr.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                      (product.nameEn && product.nameEn.toLowerCase().includes(searchTerm.toLowerCase()))
+                    )
+                    .slice(0, 5)
+                    .map(product => (
+                      <div
+                        key={product.id}
+                        className="flex items-center gap-3 p-3 hover:bg-accent cursor-pointer border-b last:border-b-0"
+                        onClick={() => setSearchTerm(product.nameAr)}
+                      >
+                        <div className="w-10 h-10 rounded bg-muted flex items-center justify-center overflow-hidden">
+                          {product.image ? (
+                            <img 
+                              src={product.image} 
+                              alt={product.nameAr}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-card flex items-center justify-center">
+                              <span className="text-xs text-muted-foreground">
+                                {product.nameAr.charAt(0)}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-sm truncate">{product.nameAr}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {product.price.toLocaleString('en-US')} DZD - متوفر: {product.quantity}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  {products.filter(product => 
+                    product.nameAr.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    (product.nameEn && product.nameEn.toLowerCase().includes(searchTerm.toLowerCase()))
+                  ).length === 0 && (
+                    <div className="p-3 text-center text-muted-foreground text-sm">
+                      لا توجد منتجات متطابقة
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
