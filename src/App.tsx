@@ -63,11 +63,11 @@ const App = () => {
   }, [missingItems]);
 
   const stats = {
-    totalProducts: products.length,
-    outOfStock: products.filter(p => p.quantity === 0).length,
-    lowStock: products.filter(p => p.quantity > 0 && p.quantity <= (p.minStock || 5)).length,
-    totalSales: sales.length,
-    missingItems: missingItems.filter(m => !m.isResolved).length
+    totalProducts: Array.isArray(products) ? products.length : 0,
+    outOfStock: Array.isArray(products) ? products.filter(p => p.quantity === 0).length : 0,
+    lowStock: Array.isArray(products) ? products.filter(p => p.quantity > 0 && p.quantity <= (p.minStock || 5)).length : 0,
+    totalSales: Array.isArray(sales) ? sales.length : 0,
+    missingItems: Array.isArray(missingItems) ? missingItems.filter(m => !m.isResolved).length : 0
   };
 
   const handleImportData = (data: { products?: Product[]; missingItems?: MissingItem[]; sales?: Sale[] }) => {
