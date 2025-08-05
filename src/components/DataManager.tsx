@@ -9,6 +9,7 @@ import { Product } from "@/types/product";
 import { MissingItem } from "@/types/missing";
 import { Sale } from "@/types/sale";
 import { exportUtils, ExportData } from "@/utils/dataUtils";
+import { localStorageUtils } from "@/utils/localStorage";
 import { Download, Upload, FileText, Database, AlertTriangle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
@@ -31,20 +32,27 @@ export const DataManager = ({
 }: DataManagerProps) => {
   const [importFile, setImportFile] = useState<File | null>(null);
 
-  const handleExportJSON = () => {
-    const exportData: ExportData = {
-      products,
-      missingItems,
-      sales,
-      exportDate: new Date().toISOString(),
-      version: "1.0"
-    };
+  const handleExportJSON = async () => {
+    try {
+      const exportData = await localStorageUtils.exportAllData();
+      const finalExportData: ExportData = {
+        ...exportData,
+        exportDate: new Date().toISOString(),
+        version: "1.0"
+      };
 
-    exportUtils.downloadJSON(exportData);
-    toast({
-      title: "تم تصدير البيانات",
-      description: "تم تحميل ملف JSON بجميع البيانات",
-    });
+      exportUtils.downloadJSON(finalExportData);
+      toast({
+        title: "تم تصدير البيانات",
+        description: "تم تحميل ملف JSON بجميع البيانات",
+      });
+    } catch (error) {
+      toast({
+        title: "خطأ في التصدير",
+        description: "فشل في تصدير البيانات",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleExportCSV = () => {
@@ -69,6 +77,14 @@ export const DataManager = ({
       const fileContent = await importFile.text();
       const importedData = await exportUtils.importFromJSON(fileContent);
       
+      // Import directly to IndexedDB
+      await localStorageUtils.importAllData({
+        products: importedData.products,
+        missingItems: importedData.missingItems,
+        sales: importedData.sales
+      });
+
+      // Update component state
       onImportData({
         products: importedData.products,
         missingItems: importedData.missingItems,

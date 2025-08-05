@@ -24,16 +24,43 @@ const App = () => {
 
   // Load data on mount
   useEffect(() => {
-    const savedProducts = localStorageUtils.loadProducts();
-    setProducts(savedProducts);
+    const loadData = async () => {
+      try {
+        const [savedProducts, savedSales, savedMissingItems] = await Promise.all([
+          localStorageUtils.loadProducts(),
+          localStorageUtils.loadSales(),
+          localStorageUtils.loadMissingItems()
+        ]);
+        
+        setProducts(savedProducts);
+        setSales(savedSales);
+        setMissingItems(savedMissingItems);
+      } catch (error) {
+        console.error('Failed to load data:', error);
+      }
+    };
+
+    loadData();
   }, []);
 
-  // Save products when they change
+  // Save data when they change
   useEffect(() => {
     if (products.length > 0) {
       localStorageUtils.saveProducts(products);
     }
   }, [products]);
+
+  useEffect(() => {
+    if (sales.length > 0) {
+      localStorageUtils.saveSales(sales);
+    }
+  }, [sales]);
+
+  useEffect(() => {
+    if (missingItems.length > 0) {
+      localStorageUtils.saveMissingItems(missingItems);
+    }
+  }, [missingItems]);
 
   const stats = {
     totalProducts: products.length,
