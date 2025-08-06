@@ -43,6 +43,7 @@ const MissingItems = ({ products }: MissingItemsProps) => {
           description: 'تم الكشف تلقائياً عند نفاد المخزون',
           supplier: product.supplier,
           estimatedPrice: product.price,
+          image: product.image, // Include product image
           detectedAt: new Date(),
           isResolved: false
         };
@@ -267,6 +268,32 @@ const MissingItems = ({ products }: MissingItemsProps) => {
             padding: 12px;
             background: white;
             page-break-inside: avoid;
+            display: flex;
+            gap: 10px;
+        }
+        .item-image {
+            width: 60px;
+            height: 60px;
+            border: 1px solid black;
+            border-radius: 4px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        .item-placeholder {
+            width: 60px;
+            height: 60px;
+            border: 1px solid black;
+            border-radius: 4px;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        .item-content {
+            flex: 1;
         }
         .item h3 {
             font-size: 14px;
@@ -291,6 +318,7 @@ const MissingItems = ({ products }: MissingItemsProps) => {
             body { margin: 0; padding: 15px; }
             .stats { grid-template-columns: repeat(2, 1fr); }
             .items { grid-template-columns: 1fr; }
+            .item { flex-direction: row; }
         }
     </style>
 </head>
@@ -323,16 +351,22 @@ const MissingItems = ({ products }: MissingItemsProps) => {
     <div class="items">
         ${filteredItems.map(item => `
             <div class="item">
-                <h3>${item.nameAr}</h3>
-                <div class="priority">${priorityLabels[item.priority] || item.priority}</div>
-                <div class="details">
-                    <div><strong>السبب:</strong> ${reasonLabels[item.reason] || item.reason}</div>
-                    <div><strong>الفئة:</strong> ${item.category}</div>
-                    ${item.estimatedPrice ? `<div><strong>السعر المقدر:</strong> ${item.estimatedPrice.toLocaleString('ar-EG')} دج</div>` : ''}
-                    ${item.supplier ? `<div><strong>المورد:</strong> ${item.supplier}</div>` : ''}
-                    <div><strong>تاريخ الاكتشاف:</strong> ${new Date(item.detectedAt).toLocaleDateString('ar-EG')}</div>
-                    ${item.description ? `<div><strong>الوصف:</strong> ${item.description}</div>` : ''}
-                    <div><strong>الحالة:</strong> ${item.isResolved ? 'محلولة' : 'غير محلولة'}</div>
+                ${item.image ? 
+                    `<img src="${item.image}" alt="${item.nameAr}" class="item-image" />` :
+                    `<div class="item-placeholder">${item.nameAr.charAt(0)}</div>`
+                }
+                <div class="item-content">
+                    <h3>${item.nameAr}</h3>
+                    <div class="priority">${priorityLabels[item.priority] || item.priority}</div>
+                    <div class="details">
+                        <div><strong>السبب:</strong> ${reasonLabels[item.reason] || item.reason}</div>
+                        <div><strong>الفئة:</strong> ${item.category}</div>
+                        ${item.estimatedPrice ? `<div><strong>السعر المقدر:</strong> ${item.estimatedPrice.toLocaleString('ar-EG')} دج</div>` : ''}
+                        ${item.supplier ? `<div><strong>المورد:</strong> ${item.supplier}</div>` : ''}
+                        <div><strong>تاريخ الاكتشاف:</strong> ${new Date(item.detectedAt).toLocaleDateString('ar-EG')}</div>
+                        ${item.description ? `<div><strong>الوصف:</strong> ${item.description}</div>` : ''}
+                        <div><strong>الحالة:</strong> ${item.isResolved ? 'محلولة' : 'غير محلولة'}</div>
+                    </div>
                 </div>
             </div>
         `).join('')}
