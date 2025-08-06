@@ -170,13 +170,30 @@ export const SalesForm = ({ isOpen, onClose, onSubmit, products }: SalesFormProp
                       key={product.id}
                       type="button"
                       variant="ghost"
-                      className="w-full justify-between text-right"
+                      className="w-full h-auto p-3 justify-start text-right"
                       onClick={() => addItem(product)}
                     >
-                      <span>{product.nameAr} - {product.price.toLocaleString('en-US')} DZD</span>
-                      <span className="text-sm text-muted-foreground">
-                        متوفر: {product.quantity}
-                      </span>
+                      <div className="flex items-center gap-3 w-full">
+                        <div className="flex-1 text-right">
+                          <div className="font-medium">{product.nameAr}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {product.price.toLocaleString('en-US')} DZD - متوفر: {product.quantity}
+                          </div>
+                        </div>
+                        <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                          {product.image ? (
+                            <img 
+                              src={product.image} 
+                              alt={product.nameAr}
+                              className="w-full h-full object-cover rounded-lg"
+                            />
+                          ) : (
+                            <div className="text-xs text-muted-foreground text-center">
+                              {product.nameAr.charAt(0)}
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </Button>
                   ))}
                   {availableProducts.length === 0 && (
