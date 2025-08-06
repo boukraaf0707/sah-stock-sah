@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Index from "./pages/Index";
 import MissingItems from "./pages/MissingItems";
+import { Debts } from "./pages/Debts";
 import Sales from "./pages/Sales";
 import Reports from "./pages/Reports";
 import NotFound from "./pages/NotFound";
@@ -87,6 +88,7 @@ const App = () => {
               <Route path="/" element={<Index products={products} onUpdateProducts={setProducts} />} />
               <Route path="/missing" element={<MissingItems products={products} />} />
               <Route path="/sales" element={<Sales products={products} onUpdateProducts={setProducts} />} />
+              <Route path="/debts" element={<Debts products={products} />} />
               <Route path="/reports" element={<Reports products={products} missingItems={missingItems} sales={sales} onImportData={handleImportData} />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

@@ -11,7 +11,8 @@ import {
   Menu, 
   X,
   Wifi,
-  WifiOff
+  WifiOff,
+  CreditCard
 } from "lucide-react";
 import { useOfflineStatus } from "@/hooks/useOfflineStatus";
 
@@ -50,6 +51,11 @@ const Layout = ({ children, stats }: LayoutProps) => {
       label: "المبيعات",
       icon: ShoppingCart,
       badge: stats?.totalSales
+    },
+    {
+      href: "/debts",
+      label: "الديون",
+      icon: CreditCard
     },
     {
       href: "/reports",
