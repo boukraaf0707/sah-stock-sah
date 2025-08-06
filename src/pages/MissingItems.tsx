@@ -176,250 +176,184 @@ const MissingItems = ({ products }: MissingItemsProps) => {
   };
 
   const handlePrint = () => {
-    try {
-      // Create print content
-      const getProductImage = (item: MissingItem) => {
-        const product = products.find(p => p.id === item.productId);
-        return product?.image || '';
-      };
-
-      const printContent = `
-        <!DOCTYPE html>
-        <html dir="rtl">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>تقرير الأصناف المفقودة</title>
-          <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { 
-              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-              direction: rtl; 
-              text-align: right; 
-              padding: 20px; 
-              background: white;
-              color: black;
-            }
-            .header { 
-              text-align: center; 
-              margin-bottom: 30px; 
-              padding-bottom: 20px; 
-              border-bottom: 2px solid #333; 
-            }
-            .header h1 { 
-              font-size: 28px; 
-              color: #333; 
-              margin-bottom: 10px; 
-            }
-            .header p { 
-              color: #666; 
-              font-size: 14px; 
-            }
-            .stats { 
-              display: grid; 
-              grid-template-columns: repeat(4, 1fr); 
-              gap: 15px; 
-              margin-bottom: 30px; 
-            }
-            .stat-card { 
-              padding: 15px; 
-              border: 2px solid #333; 
-              border-radius: 8px; 
-              text-align: center; 
-              background: #f5f5f5;
-            }
-            .stat-card h3 { 
-              font-size: 14px; 
-              color: #333; 
-              margin-bottom: 8px; 
-              font-weight: bold;
-            }
-            .stat-card .number { 
-              font-size: 24px; 
-              font-weight: bold; 
-              color: #000; 
-            }
-            .items-grid { 
-              display: grid; 
-              grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
-              gap: 20px; 
-            }
-            .item-card { 
-              border: 2px solid #333; 
-              border-radius: 8px; 
-              padding: 15px; 
-              background: white; 
-              page-break-inside: avoid;
-            }
-            .item-header { 
-              margin-bottom: 15px; 
-              border-bottom: 1px solid #ddd;
-              padding-bottom: 10px;
-            }
-            .item-info h3 { 
-              font-size: 18px; 
-              color: #000; 
-              margin-bottom: 8px; 
-              font-weight: bold;
-            }
-            .item-details { 
-              font-size: 14px; 
-              color: #333; 
-            }
-            .item-details div { 
-              margin-bottom: 8px; 
-              line-height: 1.4;
-            }
-            .priority { 
-              display: inline-block; 
-              padding: 4px 12px; 
-              border-radius: 4px; 
-              font-size: 12px; 
-              font-weight: bold; 
-              border: 1px solid #333;
-            }
-            .priority.urgent { background: #ffebee; color: #c62828; }
-            .priority.high { background: #fff3e0; color: #ef6c00; }
-            .priority.medium { background: #f1f8e9; color: #2e7d32; }
-            .priority.low { background: #e3f2fd; color: #1565c0; }
-            @media print {
-              body { margin: 0; padding: 15px; }
-              .item-card { break-inside: avoid; }
-              .stats { grid-template-columns: repeat(2, 1fr); }
-            }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <h1>تقرير الأصناف المفقودة</h1>
-            <p>تاريخ الطباعة: ${new Date().toLocaleDateString('ar-EG')} - الوقت: ${new Date().toLocaleTimeString('ar-EG')}</p>
-          </div>
-          
-          <div class="stats">
-            <div class="stat-card">
-              <h3>إجمالي المفقودات</h3>
-              <div class="number">${stats.total}</div>
-            </div>
-            <div class="stat-card">
-              <h3>غير محلولة</h3>
-              <div class="number">${stats.unresolved}</div>
-            </div>
-            <div class="stat-card">
-              <h3>عاجلة</h3>
-              <div class="number">${stats.urgent}</div>
-            </div>
-            <div class="stat-card">
-              <h3>مكتشفة تلقائياً</h3>
-              <div class="number">${stats.autoDetected}</div>
-            </div>
-          </div>
-          
-          <div class="items-grid">
-            ${filteredItems.map(item => {
-              const priorityLabels: Record<string, string> = {
-                urgent: 'عاجلة',
-                high: 'عالية', 
-                medium: 'متوسطة',
-                low: 'منخفضة'
-              };
-              const reasonLabels: Record<string, string> = {
-                out_of_stock: 'نفاد المخزون',
-                damaged: 'تالف',
-                lost: 'مفقود',
-                other: 'أخرى'
-              };
-              
-              return `
-                <div class="item-card">
-                  <div class="item-header">
-                    <div class="item-info">
-                      <h3>${item.nameAr}</h3>
-                      <span class="priority ${item.priority}">${priorityLabels[item.priority] || item.priority}</span>
-                    </div>
-                  </div>
-                  <div class="item-details">
-                    <div><strong>السبب:</strong> ${reasonLabels[item.reason] || item.reason}</div>
-                    <div><strong>الفئة:</strong> ${item.category}</div>
-                    ${item.estimatedPrice ? `<div><strong>السعر المقدر:</strong> ${item.estimatedPrice.toLocaleString('ar-EG')} دج</div>` : ''}
-                    ${item.supplier ? `<div><strong>المورد:</strong> ${item.supplier}</div>` : ''}
-                    <div><strong>تاريخ الاكتشاف:</strong> ${new Date(item.detectedAt).toLocaleDateString('ar-EG')}</div>
-                    ${item.description ? `<div><strong>الوصف:</strong> ${item.description}</div>` : ''}
-                    ${item.isResolved ? `<div><strong>تاريخ الحل:</strong> ${item.resolvedAt ? new Date(item.resolvedAt).toLocaleDateString('ar-EG') : 'غير محدد'}</div>` : ''}
-                  </div>
-                </div>
-              `;
-            }).join('')}
-          </div>
-          
-          ${filteredItems.length === 0 ? '<div style="text-align: center; padding: 40px; font-size: 18px; color: #666;">لا توجد أصناف مفقودة للطباعة</div>' : ''}
-        </body>
-        </html>
-      `;
-
-      // Try to open print window
-      const printWindow = window.open('', '_blank', 'width=800,height=600');
-      
-      if (!printWindow) {
-        // Fallback: create a temporary iframe for printing
-        const iframe = document.createElement('iframe');
-        iframe.style.position = 'absolute';
-        iframe.style.top = '-10000px';
-        iframe.style.left = '-10000px';
-        document.body.appendChild(iframe);
-        
-        const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
-        if (iframeDoc) {
-          iframeDoc.write(printContent);
-          iframeDoc.close();
-          
-          // Wait for content to load then print
-          setTimeout(() => {
-            iframe.contentWindow?.focus();
-            iframe.contentWindow?.print();
-            
-            // Clean up
-            setTimeout(() => {
-              document.body.removeChild(iframe);
-            }, 1000);
-          }, 500);
+    // Create a temporary print stylesheet
+    const printStyle = document.createElement('style');
+    printStyle.id = 'missing-items-print-style';
+    printStyle.innerHTML = `
+      @media print {
+        body * { visibility: hidden; }
+        .print-content, .print-content * { visibility: visible; }
+        .print-content { 
+          position: absolute; 
+          left: 0; 
+          top: 0; 
+          width: 100%; 
+          background: white;
+          color: black;
+          font-family: Arial, sans-serif;
+          direction: rtl;
+          text-align: right;
         }
-        
-        toast({
-          title: "جاري الطباعة",
-          description: "تم تحضير المحتوى للطباعة",
-        });
-      } else {
-        // Standard popup window approach
-        printWindow.document.write(printContent);
-        printWindow.document.close();
-        
-        // Wait for content to load
-        printWindow.addEventListener('load', () => {
-          printWindow.focus();
-          printWindow.print();
-          printWindow.close();
-        });
-        
-        // Fallback timeout
-        setTimeout(() => {
-          printWindow.focus();
-          printWindow.print();
-          printWindow.close();
-        }, 1000);
-        
-        toast({
-          title: "جاري الطباعة",
-          description: "تم فتح نافذة الطباعة",
-        });
+        .no-print { display: none !important; }
+        .print-header { 
+          text-align: center; 
+          margin-bottom: 30px; 
+          padding-bottom: 20px; 
+          border-bottom: 2px solid #333; 
+        }
+        .print-header h1 { 
+          font-size: 24px; 
+          color: #000; 
+          margin-bottom: 10px; 
+          font-weight: bold;
+        }
+        .print-stats { 
+          display: grid; 
+          grid-template-columns: repeat(4, 1fr); 
+          gap: 15px; 
+          margin-bottom: 30px; 
+        }
+        .print-stat-card { 
+          padding: 10px; 
+          border: 2px solid #000; 
+          text-align: center; 
+          background: #f5f5f5;
+        }
+        .print-stat-card h3 { 
+          font-size: 12px; 
+          color: #000; 
+          margin-bottom: 5px; 
+          font-weight: bold;
+        }
+        .print-stat-card .number { 
+          font-size: 18px; 
+          font-weight: bold; 
+          color: #000; 
+        }
+        .print-items { 
+          display: grid; 
+          grid-template-columns: repeat(2, 1fr); 
+          gap: 15px; 
+        }
+        .print-item { 
+          border: 1px solid #000; 
+          padding: 10px; 
+          background: white; 
+          page-break-inside: avoid;
+        }
+        .print-item h3 { 
+          font-size: 14px; 
+          color: #000; 
+          margin-bottom: 8px; 
+          font-weight: bold;
+        }
+        .print-item-details { 
+          font-size: 10px; 
+          color: #000; 
+          line-height: 1.3;
+        }
+        .print-item-details div { 
+          margin-bottom: 3px; 
+        }
+        .print-priority { 
+          display: inline-block; 
+          padding: 2px 6px; 
+          border: 1px solid #000; 
+          font-size: 8px; 
+          font-weight: bold; 
+          margin-bottom: 5px;
+        }
       }
-    } catch (error) {
-      console.error('Print error:', error);
-      toast({
-        title: "خطأ في الطباعة",
-        description: "حدث خطأ أثناء تحضير المحتوى للطباعة. تأكد من السماح للنوافذ المنبثقة.",
-        variant: "destructive",
-      });
-    }
+    `;
+    
+    // Add the style to head
+    document.head.appendChild(printStyle);
+    
+    // Create print content
+    const priorityLabels: Record<string, string> = {
+      urgent: 'عاجلة',
+      high: 'عالية', 
+      medium: 'متوسطة',
+      low: 'منخفضة'
+    };
+    const reasonLabels: Record<string, string> = {
+      out_of_stock: 'نفاد المخزون',
+      damaged: 'تالف',
+      lost: 'مفقود',
+      other: 'أخرى'
+    };
+
+    const printContent = `
+      <div class="print-content" style="display: none;">
+        <div class="print-header">
+          <h1>تقرير الأصناف المفقودة</h1>
+          <p>تاريخ الطباعة: ${new Date().toLocaleDateString('ar-EG')} - الوقت: ${new Date().toLocaleTimeString('ar-EG')}</p>
+        </div>
+        
+        <div class="print-stats">
+          <div class="print-stat-card">
+            <h3>إجمالي المفقودات</h3>
+            <div class="number">${stats.total}</div>
+          </div>
+          <div class="print-stat-card">
+            <h3>غير محلولة</h3>
+            <div class="number">${stats.unresolved}</div>
+          </div>
+          <div class="print-stat-card">
+            <h3>عاجلة</h3>
+            <div class="number">${stats.urgent}</div>
+          </div>
+          <div class="print-stat-card">
+            <h3>مكتشفة تلقائياً</h3>
+            <div class="number">${stats.autoDetected}</div>
+          </div>
+        </div>
+        
+        <div class="print-items">
+          ${filteredItems.map(item => `
+            <div class="print-item">
+              <h3>${item.nameAr}</h3>
+              <span class="print-priority">${priorityLabels[item.priority] || item.priority}</span>
+              <div class="print-item-details">
+                <div><strong>السبب:</strong> ${reasonLabels[item.reason] || item.reason}</div>
+                <div><strong>الفئة:</strong> ${item.category}</div>
+                ${item.estimatedPrice ? `<div><strong>السعر المقدر:</strong> ${item.estimatedPrice.toLocaleString('ar-EG')} دج</div>` : ''}
+                ${item.supplier ? `<div><strong>المورد:</strong> ${item.supplier}</div>` : ''}
+                <div><strong>تاريخ الاكتشاف:</strong> ${new Date(item.detectedAt).toLocaleDateString('ar-EG')}</div>
+                ${item.description ? `<div><strong>الوصف:</strong> ${item.description}</div>` : ''}
+                ${item.isResolved ? `<div><strong>حالة:</strong> محلولة</div>` : '<div><strong>حالة:</strong> غير محلولة</div>'}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        
+        ${filteredItems.length === 0 ? '<div style="text-align: center; padding: 40px; font-size: 16px;">لا توجد أصناف مفقودة للطباعة</div>' : ''}
+      </div>
+    `;
+    
+    // Add print content to body
+    const printDiv = document.createElement('div');
+    printDiv.innerHTML = printContent;
+    document.body.appendChild(printDiv);
+    
+    // Trigger print
+    setTimeout(() => {
+      window.print();
+      
+      // Clean up after printing
+      setTimeout(() => {
+        document.body.removeChild(printDiv);
+        const styleElement = document.getElementById('missing-items-print-style');
+        if (styleElement) {
+          document.head.removeChild(styleElement);
+        }
+      }, 1000);
+    }, 100);
+    
+    toast({
+      title: "جاري الطباعة",
+      description: "تم تحضير التقرير للطباعة",
+    });
   };
 
   return (
