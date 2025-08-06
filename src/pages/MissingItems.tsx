@@ -176,6 +176,20 @@ const MissingItems = ({ products }: MissingItemsProps) => {
   };
 
   const handlePrint = () => {
+    // Debug: Check if we have items to print
+    console.log('Print triggered - filteredItems:', filteredItems);
+    console.log('Total missing items:', missingItems);
+    console.log('Stats:', stats);
+    
+    if (filteredItems.length === 0) {
+      toast({
+        title: "لا توجد عناصر للطباعة",
+        description: "لا توجد أصناف مفقودة تطابق المرشحات المحددة للطباعة",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Create a temporary print stylesheet
     const printStyle = document.createElement('style');
     printStyle.id = 'missing-items-print-style';
@@ -188,12 +202,13 @@ const MissingItems = ({ products }: MissingItemsProps) => {
           left: 0; 
           top: 0; 
           width: 100%; 
-          background: white;
-          color: black;
+          background: white !important;
+          color: black !important;
           font-family: Arial, sans-serif;
           direction: rtl;
           text-align: right;
           padding: 20px;
+          margin: 0;
         }
         .print-header { 
           text-align: center; 
@@ -203,13 +218,13 @@ const MissingItems = ({ products }: MissingItemsProps) => {
         }
         .print-header h1 { 
           font-size: 20px; 
-          color: #000; 
+          color: #000 !important; 
           margin-bottom: 8px; 
           font-weight: bold;
         }
         .print-header p { 
           font-size: 12px; 
-          color: #000; 
+          color: #000 !important; 
         }
         .print-stats { 
           display: grid; 
@@ -221,42 +236,44 @@ const MissingItems = ({ products }: MissingItemsProps) => {
           padding: 8px; 
           border: 1px solid #000; 
           text-align: center; 
-          background: #f9f9f9;
+          background: #f9f9f9 !important;
         }
         .print-stat-card h3 { 
           font-size: 10px; 
-          color: #000; 
+          color: #000 !important; 
           margin-bottom: 4px; 
           font-weight: bold;
         }
         .print-stat-card .number { 
           font-size: 16px; 
           font-weight: bold; 
-          color: #000; 
+          color: #000 !important; 
         }
         .print-items { 
-          display: block;
+          display: block !important;
         }
         .print-item { 
           border: 1px solid #000; 
           padding: 8px; 
           margin-bottom: 10px;
-          background: white; 
+          background: white !important; 
           page-break-inside: avoid;
+          display: block !important;
         }
         .print-item h3 { 
           font-size: 12px; 
-          color: #000; 
+          color: #000 !important; 
           margin-bottom: 6px; 
           font-weight: bold;
         }
         .print-item-details { 
           font-size: 9px; 
-          color: #000; 
+          color: #000 !important; 
           line-height: 1.2;
         }
         .print-item-details div { 
           margin-bottom: 2px; 
+          color: #000 !important;
         }
         .print-priority { 
           display: inline-block; 
@@ -265,7 +282,16 @@ const MissingItems = ({ products }: MissingItemsProps) => {
           font-size: 8px; 
           font-weight: bold; 
           margin-bottom: 4px;
-          background: white;
+          background: white !important;
+          color: #000 !important;
+        }
+        .print-no-items {
+          text-align: center; 
+          padding: 20px; 
+          font-size: 14px; 
+          border: 1px solid #000;
+          background: white !important;
+          color: #000 !important;
         }
       }
     `;
@@ -298,10 +324,30 @@ const MissingItems = ({ products }: MissingItemsProps) => {
     printDiv.id = 'print-content';
     printDiv.style.display = 'none';
     
+    const itemsHtml = filteredItems.map(item => {
+      console.log('Processing item for print:', item);
+      return `
+        <div class="print-item">
+          <h3>${item.nameAr || 'بدون اسم'}</h3>
+          <span class="print-priority">${priorityLabels[item.priority] || item.priority}</span>
+          <div class="print-item-details">
+            <div><strong>السبب:</strong> ${reasonLabels[item.reason] || item.reason}</div>
+            <div><strong>الفئة:</strong> ${item.category || 'غير محدد'}</div>
+            ${item.estimatedPrice ? `<div><strong>السعر المقدر:</strong> ${item.estimatedPrice.toLocaleString('ar-EG')} دج</div>` : ''}
+            ${item.supplier ? `<div><strong>المورد:</strong> ${item.supplier}</div>` : ''}
+            <div><strong>تاريخ الاكتشاف:</strong> ${new Date(item.detectedAt).toLocaleDateString('ar-EG')}</div>
+            ${item.description ? `<div><strong>الوصف:</strong> ${item.description}</div>` : ''}
+            <div><strong>حالة:</strong> ${item.isResolved ? 'محلولة' : 'غير محلولة'}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+    
     printDiv.innerHTML = `
       <div class="print-header">
         <h1>تقرير الأصناف المفقودة</h1>
         <p>تاريخ الطباعة: ${new Date().toLocaleDateString('ar-EG')} - الوقت: ${new Date().toLocaleTimeString('ar-EG')}</p>
+        <p>عدد العناصر: ${filteredItems.length}</p>
       </div>
       
       <div class="print-stats">
@@ -324,26 +370,14 @@ const MissingItems = ({ products }: MissingItemsProps) => {
       </div>
       
       <div class="print-items">
-        ${filteredItems.length > 0 ? filteredItems.map(item => `
-          <div class="print-item">
-            <h3>${item.nameAr}</h3>
-            <span class="print-priority">${priorityLabels[item.priority] || item.priority}</span>
-            <div class="print-item-details">
-              <div><strong>السبب:</strong> ${reasonLabels[item.reason] || item.reason}</div>
-              <div><strong>الفئة:</strong> ${item.category}</div>
-              ${item.estimatedPrice ? `<div><strong>السعر المقدر:</strong> ${item.estimatedPrice.toLocaleString('ar-EG')} دج</div>` : ''}
-              ${item.supplier ? `<div><strong>المورد:</strong> ${item.supplier}</div>` : ''}
-              <div><strong>تاريخ الاكتشاف:</strong> ${new Date(item.detectedAt).toLocaleDateString('ar-EG')}</div>
-              ${item.description ? `<div><strong>الوصف:</strong> ${item.description}</div>` : ''}
-              <div><strong>حالة:</strong> ${item.isResolved ? 'محلولة' : 'غير محلولة'}</div>
-            </div>
-          </div>
-        `).join('') : '<div style="text-align: center; padding: 20px; font-size: 14px; border: 1px solid #000;">لا توجد أصناف مفقودة للطباعة</div>'}
+        ${itemsHtml || '<div class="print-no-items">لا توجد أصناف مفقودة للطباعة</div>'}
       </div>
     `;
     
     // Add print content to body
     document.body.appendChild(printDiv);
+    
+    console.log('Print content created:', printDiv.innerHTML);
     
     // Trigger print after a small delay
     setTimeout(() => {
@@ -360,11 +394,11 @@ const MissingItems = ({ products }: MissingItemsProps) => {
           document.head.removeChild(styleElement);
         }
       }, 1000);
-    }, 100);
+    }, 200);
     
     toast({
       title: "جاري الطباعة",
-      description: "تم تحضير التقرير للطباعة",
+      description: `تم تحضير ${filteredItems.length} عنصر للطباعة`,
     });
   };
 
