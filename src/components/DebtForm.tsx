@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Product } from "@/types/product";
 import { DebtForm as DebtFormType, DebtItem } from "@/types/debt";
@@ -25,6 +26,8 @@ export const DebtForm = ({ isOpen, onClose, onSubmit, products }: DebtFormProps)
     notes: ''
   });
   const [searchTerm, setSearchTerm] = useState('');
+  const [debtType, setDebtType] = useState<'items' | 'amount'>('items');
+  const [directAmount, setDirectAmount] = useState('');
 
   // Filter available products (only in stock)
   const availableProducts = useMemo(() => {
@@ -34,8 +37,11 @@ export const DebtForm = ({ isOpen, onClose, onSubmit, products }: DebtFormProps)
   }, [products, searchTerm]);
 
   const totalAmount = useMemo(() => {
+    if (debtType === 'amount') {
+      return parseFloat(directAmount) || 0;
+    }
     return formData.items.reduce((sum, item) => sum + item.totalPrice, 0);
-  }, [formData.items]);
+  }, [formData.items, debtType, directAmount]);
 
   const addItem = (product: Product) => {
     const existingItem = formData.items.find(item => item.productId === product.id);
@@ -113,7 +119,7 @@ export const DebtForm = ({ isOpen, onClose, onSubmit, products }: DebtFormProps)
       return;
     }
 
-    if (formData.items.length === 0) {
+    if (debtType === 'items' && formData.items.length === 0) {
       toast({
         title: "خطأ",
         description: "يجب إضافة منتج واحد على الأقل",
@@ -122,7 +128,30 @@ export const DebtForm = ({ isOpen, onClose, onSubmit, products }: DebtFormProps)
       return;
     }
 
-    onSubmit(formData);
+    if (debtType === 'amount' && (!directAmount || parseFloat(directAmount) <= 0)) {
+      toast({
+        title: "خطأ",
+        description: "يجب إدخال مبلغ صحيح",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Create a general debt item for amount-based debts
+    const finalFormData = debtType === 'amount' 
+      ? {
+          ...formData,
+          items: [{
+            productId: 'general-debt',
+            productName: 'دين عام',
+            quantity: 1,
+            unitPrice: parseFloat(directAmount),
+            totalPrice: parseFloat(directAmount)
+          }]
+        }
+      : formData;
+
+    onSubmit(finalFormData);
     setFormData({
       clientName: '',
       clientPhone: '',
@@ -130,6 +159,7 @@ export const DebtForm = ({ isOpen, onClose, onSubmit, products }: DebtFormProps)
       notes: ''
     });
     setSearchTerm('');
+    setDirectAmount('');
     onClose();
   };
 
@@ -141,6 +171,7 @@ export const DebtForm = ({ isOpen, onClose, onSubmit, products }: DebtFormProps)
       notes: ''
     });
     setSearchTerm('');
+    setDirectAmount('');
     onClose();
   };
 
@@ -176,125 +207,166 @@ export const DebtForm = ({ isOpen, onClose, onSubmit, products }: DebtFormProps)
             </div>
           </div>
 
-          {/* Product Search */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">البحث عن المنتجات</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="relative">
-                <Search className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="ابحث عن المنتجات..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pr-10"
-                />
-              </div>
-              
-              {searchTerm && (
-                <div className="mt-2 max-h-32 overflow-y-auto space-y-1">
-                  {availableProducts.map(product => (
-                    <Button
-                      key={product.id}
-                      type="button"
-                      variant="ghost"
-                      className="w-full h-auto p-3 justify-start text-right"
-                      onClick={() => addItem(product)}
-                    >
-                      <div className="flex items-center gap-3 w-full">
-                        <div className="flex-1 text-right">
-                          <div className="font-medium">{product.nameAr}</div>
-                          <div className="text-sm text-muted-foreground">
-                            {(product.sellingPrice || product.price).toLocaleString('en-US')} DZD - متوفر: {product.quantity}
+          {/* Debt Type Selection */}
+          <Tabs value={debtType} onValueChange={(value: string) => setDebtType(value as 'items' | 'amount')}>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="items">بحسب المنتجات</TabsTrigger>
+              <TabsTrigger value="amount">مبلغ مباشر</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="items" className="space-y-6">
+              {/* Product Search */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">البحث عن المنتجات</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="relative">
+                    <Search className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="ابحث عن المنتجات..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pr-10"
+                    />
+                  </div>
+                  
+                  {searchTerm && (
+                    <div className="mt-2 max-h-32 overflow-y-auto space-y-1">
+                      {availableProducts.map(product => (
+                        <Button
+                          key={product.id}
+                          type="button"
+                          variant="ghost"
+                          className="w-full h-auto p-3 justify-start text-right"
+                          onClick={() => addItem(product)}
+                        >
+                          <div className="flex items-center gap-3 w-full">
+                            <div className="flex-1 text-right">
+                              <div className="font-medium">{product.nameAr}</div>
+                              <div className="text-sm text-muted-foreground">
+                                {(product.sellingPrice || product.price).toLocaleString('en-US')} DZD - متوفر: {product.quantity}
+                              </div>
+                            </div>
+                            <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                              {product.image ? (
+                                <img 
+                                  src={product.image} 
+                                  alt={product.nameAr}
+                                  className="w-full h-full object-cover rounded-lg"
+                                />
+                              ) : (
+                                <div className="text-xs text-muted-foreground text-center">
+                                  {product.nameAr.charAt(0)}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </Button>
+                      ))}
+                      {availableProducts.length === 0 && (
+                        <p className="text-center text-muted-foreground py-2">
+                          لا توجد منتجات متطابقة
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Debt Items */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">المنتجات المحددة</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {formData.items.length === 0 ? (
+                    <p className="text-center text-muted-foreground py-4">
+                      لم يتم تحديد أي منتجات بعد
+                    </p>
+                  ) : (
+                    <div className="space-y-2">
+                      {formData.items.map(item => (
+                        <div key={item.productId} className="flex items-center gap-2 p-3 border rounded-lg">
+                          <div className="flex-1 text-right">
+                            <div className="font-medium">{item.productName}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {item.unitPrice.toLocaleString('en-US')} DZD × {item.quantity} = {item.totalPrice.toLocaleString('en-US')} DZD
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-1">
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              onClick={() => updateItemQuantity(item.productId, item.quantity - 1)}
+                            >
+                              <Minus className="w-4 h-4" />
+                            </Button>
+                            <span className="w-8 text-center">{item.quantity}</span>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              onClick={() => updateItemQuantity(item.productId, item.quantity + 1)}
+                            >
+                              <Plus className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => removeItem(item.productId)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
                           </div>
                         </div>
-                        <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
-                          {product.image ? (
-                            <img 
-                              src={product.image} 
-                              alt={product.nameAr}
-                              className="w-full h-full object-cover rounded-lg"
-                            />
-                          ) : (
-                            <div className="text-xs text-muted-foreground text-center">
-                              {product.nameAr.charAt(0)}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </Button>
-                  ))}
-                  {availableProducts.length === 0 && (
-                    <p className="text-center text-muted-foreground py-2">
-                      لا توجد منتجات متطابقة
-                    </p>
-                  )}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Debt Items */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">المنتجات المحددة</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {formData.items.length === 0 ? (
-                <p className="text-center text-muted-foreground py-4">
-                  لم يتم تحديد أي منتجات بعد
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {formData.items.map(item => (
-                    <div key={item.productId} className="flex items-center gap-2 p-3 border rounded-lg">
-                      <div className="flex-1 text-right">
-                        <div className="font-medium">{item.productName}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {item.unitPrice.toLocaleString('en-US')} DZD × {item.quantity} = {item.totalPrice.toLocaleString('en-US')} DZD
-                        </div>
-                      </div>
+                      ))}
                       
-                      <div className="flex items-center gap-1">
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          onClick={() => updateItemQuantity(item.productId, item.quantity - 1)}
-                        >
-                          <Minus className="w-4 h-4" />
-                        </Button>
-                        <span className="w-8 text-center">{item.quantity}</span>
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          onClick={() => updateItemQuantity(item.productId, item.quantity + 1)}
-                        >
-                          <Plus className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => removeItem(item.productId)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                      <div className="border-t pt-2 mt-4">
+                        <div className="text-lg font-bold text-right">
+                          إجمالي المبلغ: {totalAmount.toLocaleString('en-US')} DZD
+                        </div>
                       </div>
                     </div>
-                  ))}
-                  
-                  <div className="border-t pt-2 mt-4">
-                    <div className="text-lg font-bold text-right">
-                      إجمالي المبلغ: {totalAmount.toLocaleString('en-US')} DZD
-                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="amount" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">مبلغ الدين</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div>
+                    <Label htmlFor="directAmount">المبلغ المستحق *</Label>
+                    <Input
+                      id="directAmount"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={directAmount}
+                      onChange={(e) => setDirectAmount(e.target.value)}
+                      placeholder="المبلغ بالدينار الجزائري"
+                      required={debtType === 'amount'}
+                    />
                   </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                  
+                  {directAmount && parseFloat(directAmount) > 0 && (
+                    <div className="mt-4 p-3 bg-muted rounded-lg">
+                      <div className="text-lg font-bold text-right">
+                        إجمالي المبلغ: {parseFloat(directAmount).toLocaleString('en-US')} DZD
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
 
           {/* Notes */}
           <div>
@@ -309,7 +381,7 @@ export const DebtForm = ({ isOpen, onClose, onSubmit, products }: DebtFormProps)
           </div>
 
           <div className="flex gap-2 pt-4">
-            <Button type="submit" className="flex-1" disabled={formData.items.length === 0 || !formData.clientName.trim()}>
+            <Button type="submit" className="flex-1" disabled={(debtType === 'items' && formData.items.length === 0) || !formData.clientName.trim() || (debtType === 'amount' && (!directAmount || parseFloat(directAmount) <= 0))}>
               تسجيل الدين ({totalAmount.toLocaleString('en-US')} DZD)
             </Button>
             <Button type="button" variant="outline" onClick={handleClose}>
