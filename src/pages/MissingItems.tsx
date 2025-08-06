@@ -176,210 +176,250 @@ const MissingItems = ({ products }: MissingItemsProps) => {
   };
 
   const handlePrint = () => {
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
+    try {
+      // Create print content
+      const getProductImage = (item: MissingItem) => {
+        const product = products.find(p => p.id === item.productId);
+        return product?.image || '';
+      };
 
-    const getProductImage = (item: MissingItem) => {
-      const product = products.find(p => p.id === item.productId);
-      return product?.image || '';
-    };
-
-    const printContent = `
-      <!DOCTYPE html>
-      <html dir="rtl">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>تقرير الأصناف المفقودة</title>
-        <style>
-          * { margin: 0; padding: 0; box-sizing: border-box; }
-          body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            direction: rtl; 
-            text-align: right; 
-            padding: 20px; 
-            background: white;
-          }
-          .header { 
-            text-align: center; 
-            margin-bottom: 30px; 
-            padding-bottom: 20px; 
-            border-bottom: 2px solid #ccc; 
-          }
-          .header h1 { 
-            font-size: 28px; 
-            color: #333; 
-            margin-bottom: 10px; 
-          }
-          .header p { 
-            color: #666; 
-            font-size: 14px; 
-          }
-          .stats { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-            gap: 15px; 
-            margin-bottom: 30px; 
-          }
-          .stat-card { 
-            padding: 15px; 
-            border: 1px solid #ddd; 
-            border-radius: 8px; 
-            text-align: center; 
-          }
-          .stat-card h3 { 
-            font-size: 12px; 
-            color: #666; 
-            margin-bottom: 5px; 
-          }
-          .stat-card .number { 
-            font-size: 24px; 
-            font-weight: bold; 
-            color: #333; 
-          }
-          .items-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-            gap: 20px; 
-          }
-          .item-card { 
-            border: 1px solid #ddd; 
-            border-radius: 8px; 
-            padding: 15px; 
-            background: #f9f9f9; 
-          }
-          .item-header { 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-            margin-bottom: 15px; 
-          }
-          .item-image { 
-            width: 60px; 
-            height: 60px; 
-            border-radius: 8px; 
-            object-fit: cover; 
-            border: 1px solid #ddd; 
-          }
-          .item-placeholder { 
-            width: 60px; 
-            height: 60px; 
-            border-radius: 8px; 
-            background: #e0e0e0; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 20px; 
-            color: #666; 
-            border: 1px solid #ddd; 
-          }
-          .item-info h3 { 
-            font-size: 16px; 
-            color: #333; 
-            margin-bottom: 5px; 
-          }
-          .item-details { 
-            font-size: 12px; 
-            color: #666; 
-          }
-          .item-details div { 
-            margin-bottom: 5px; 
-          }
-          .priority { 
-            display: inline-block; 
-            padding: 3px 8px; 
-            border-radius: 4px; 
-            font-size: 10px; 
-            font-weight: bold; 
-          }
-          .priority.urgent { background: #fee; color: #c00; }
-          .priority.high { background: #fef0e6; color: #d46b08; }
-          .priority.medium { background: #f6ffed; color: #52c41a; }
-          .priority.low { background: #f0f5ff; color: #1890ff; }
-          @media print {
-            body { margin: 0; }
-            .item-card { break-inside: avoid; }
-          }
-        </style>
-      </head>
-      <body>
-        <div class="header">
-          <h1>تقرير الأصناف المفقودة</h1>
-          <p>تاريخ الطباعة: ${new Date().toLocaleDateString('en-US')}</p>
-        </div>
-        
-        <div class="stats">
-          <div class="stat-card">
-            <h3>إجمالي المفقودات</h3>
-            <div class="number">${stats.total}</div>
+      const printContent = `
+        <!DOCTYPE html>
+        <html dir="rtl">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>تقرير الأصناف المفقودة</title>
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { 
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+              direction: rtl; 
+              text-align: right; 
+              padding: 20px; 
+              background: white;
+              color: black;
+            }
+            .header { 
+              text-align: center; 
+              margin-bottom: 30px; 
+              padding-bottom: 20px; 
+              border-bottom: 2px solid #333; 
+            }
+            .header h1 { 
+              font-size: 28px; 
+              color: #333; 
+              margin-bottom: 10px; 
+            }
+            .header p { 
+              color: #666; 
+              font-size: 14px; 
+            }
+            .stats { 
+              display: grid; 
+              grid-template-columns: repeat(4, 1fr); 
+              gap: 15px; 
+              margin-bottom: 30px; 
+            }
+            .stat-card { 
+              padding: 15px; 
+              border: 2px solid #333; 
+              border-radius: 8px; 
+              text-align: center; 
+              background: #f5f5f5;
+            }
+            .stat-card h3 { 
+              font-size: 14px; 
+              color: #333; 
+              margin-bottom: 8px; 
+              font-weight: bold;
+            }
+            .stat-card .number { 
+              font-size: 24px; 
+              font-weight: bold; 
+              color: #000; 
+            }
+            .items-grid { 
+              display: grid; 
+              grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+              gap: 20px; 
+            }
+            .item-card { 
+              border: 2px solid #333; 
+              border-radius: 8px; 
+              padding: 15px; 
+              background: white; 
+              page-break-inside: avoid;
+            }
+            .item-header { 
+              margin-bottom: 15px; 
+              border-bottom: 1px solid #ddd;
+              padding-bottom: 10px;
+            }
+            .item-info h3 { 
+              font-size: 18px; 
+              color: #000; 
+              margin-bottom: 8px; 
+              font-weight: bold;
+            }
+            .item-details { 
+              font-size: 14px; 
+              color: #333; 
+            }
+            .item-details div { 
+              margin-bottom: 8px; 
+              line-height: 1.4;
+            }
+            .priority { 
+              display: inline-block; 
+              padding: 4px 12px; 
+              border-radius: 4px; 
+              font-size: 12px; 
+              font-weight: bold; 
+              border: 1px solid #333;
+            }
+            .priority.urgent { background: #ffebee; color: #c62828; }
+            .priority.high { background: #fff3e0; color: #ef6c00; }
+            .priority.medium { background: #f1f8e9; color: #2e7d32; }
+            .priority.low { background: #e3f2fd; color: #1565c0; }
+            @media print {
+              body { margin: 0; padding: 15px; }
+              .item-card { break-inside: avoid; }
+              .stats { grid-template-columns: repeat(2, 1fr); }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>تقرير الأصناف المفقودة</h1>
+            <p>تاريخ الطباعة: ${new Date().toLocaleDateString('ar-EG')} - الوقت: ${new Date().toLocaleTimeString('ar-EG')}</p>
           </div>
-          <div class="stat-card">
-            <h3>غير محلولة</h3>
-            <div class="number">${stats.unresolved}</div>
+          
+          <div class="stats">
+            <div class="stat-card">
+              <h3>إجمالي المفقودات</h3>
+              <div class="number">${stats.total}</div>
+            </div>
+            <div class="stat-card">
+              <h3>غير محلولة</h3>
+              <div class="number">${stats.unresolved}</div>
+            </div>
+            <div class="stat-card">
+              <h3>عاجلة</h3>
+              <div class="number">${stats.urgent}</div>
+            </div>
+            <div class="stat-card">
+              <h3>مكتشفة تلقائياً</h3>
+              <div class="number">${stats.autoDetected}</div>
+            </div>
           </div>
-          <div class="stat-card">
-            <h3>عاجلة</h3>
-            <div class="number">${stats.urgent}</div>
-          </div>
-          <div class="stat-card">
-            <h3>مكتشفة تلقائياً</h3>
-            <div class="number">${stats.autoDetected}</div>
-          </div>
-        </div>
-        
-        <div class="items-grid">
-          ${filteredItems.map(item => {
-            const image = getProductImage(item);
-            const priorityLabels: Record<string, string> = {
-              urgent: 'عاجلة',
-              high: 'عالية', 
-              medium: 'متوسطة',
-              low: 'منخفضة'
-            };
-            const reasonLabels: Record<string, string> = {
-              out_of_stock: 'نفاد المخزون',
-              damaged: 'تالف',
-              lost: 'مفقود',
-              other: 'أخرى'
-            };
-            
-            return `
-              <div class="item-card">
-                <div class="item-header">
-                  ${image ? 
-                    `<img src="${image}" alt="${item.nameAr}" class="item-image" />` :
-                    `<div class="item-placeholder">${item.nameAr.charAt(0)}</div>`
-                  }
-                  <div class="item-info">
-                    <h3>${item.nameAr}</h3>
-                    <span class="priority ${item.priority}">${priorityLabels[item.priority] || item.priority}</span>
+          
+          <div class="items-grid">
+            ${filteredItems.map(item => {
+              const priorityLabels: Record<string, string> = {
+                urgent: 'عاجلة',
+                high: 'عالية', 
+                medium: 'متوسطة',
+                low: 'منخفضة'
+              };
+              const reasonLabels: Record<string, string> = {
+                out_of_stock: 'نفاد المخزون',
+                damaged: 'تالف',
+                lost: 'مفقود',
+                other: 'أخرى'
+              };
+              
+              return `
+                <div class="item-card">
+                  <div class="item-header">
+                    <div class="item-info">
+                      <h3>${item.nameAr}</h3>
+                      <span class="priority ${item.priority}">${priorityLabels[item.priority] || item.priority}</span>
+                    </div>
+                  </div>
+                  <div class="item-details">
+                    <div><strong>السبب:</strong> ${reasonLabels[item.reason] || item.reason}</div>
+                    <div><strong>الفئة:</strong> ${item.category}</div>
+                    ${item.estimatedPrice ? `<div><strong>السعر المقدر:</strong> ${item.estimatedPrice.toLocaleString('ar-EG')} دج</div>` : ''}
+                    ${item.supplier ? `<div><strong>المورد:</strong> ${item.supplier}</div>` : ''}
+                    <div><strong>تاريخ الاكتشاف:</strong> ${new Date(item.detectedAt).toLocaleDateString('ar-EG')}</div>
+                    ${item.description ? `<div><strong>الوصف:</strong> ${item.description}</div>` : ''}
+                    ${item.isResolved ? `<div><strong>تاريخ الحل:</strong> ${item.resolvedAt ? new Date(item.resolvedAt).toLocaleDateString('ar-EG') : 'غير محدد'}</div>` : ''}
                   </div>
                 </div>
-                <div class="item-details">
-                  <div><strong>السبب:</strong> ${reasonLabels[item.reason] || item.reason}</div>
-                  ${item.estimatedPrice ? `<div><strong>السعر المقدر:</strong> ${item.estimatedPrice.toLocaleString('en-US')} DZD</div>` : ''}
-                  ${item.supplier ? `<div><strong>المورد:</strong> ${item.supplier}</div>` : ''}
-                  <div><strong>تاريخ الاكتشاف:</strong> ${item.detectedAt.toLocaleDateString('en-US')}</div>
-                  ${item.description ? `<div><strong>الوصف:</strong> ${item.description}</div>` : ''}
-                </div>
-              </div>
-            `;
-          }).join('')}
-        </div>
-      </body>
-      </html>
-    `;
+              `;
+            }).join('')}
+          </div>
+          
+          ${filteredItems.length === 0 ? '<div style="text-align: center; padding: 40px; font-size: 18px; color: #666;">لا توجد أصناف مفقودة للطباعة</div>' : ''}
+        </body>
+        </html>
+      `;
 
-    printWindow.document.write(printContent);
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-    printWindow.close();
-
-    toast({
-      title: "جاري الطباعة",
-      description: "تم فتح نافذة الطباعة",
-    });
+      // Try to open print window
+      const printWindow = window.open('', '_blank', 'width=800,height=600');
+      
+      if (!printWindow) {
+        // Fallback: create a temporary iframe for printing
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'absolute';
+        iframe.style.top = '-10000px';
+        iframe.style.left = '-10000px';
+        document.body.appendChild(iframe);
+        
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+        if (iframeDoc) {
+          iframeDoc.write(printContent);
+          iframeDoc.close();
+          
+          // Wait for content to load then print
+          setTimeout(() => {
+            iframe.contentWindow?.focus();
+            iframe.contentWindow?.print();
+            
+            // Clean up
+            setTimeout(() => {
+              document.body.removeChild(iframe);
+            }, 1000);
+          }, 500);
+        }
+        
+        toast({
+          title: "جاري الطباعة",
+          description: "تم تحضير المحتوى للطباعة",
+        });
+      } else {
+        // Standard popup window approach
+        printWindow.document.write(printContent);
+        printWindow.document.close();
+        
+        // Wait for content to load
+        printWindow.addEventListener('load', () => {
+          printWindow.focus();
+          printWindow.print();
+          printWindow.close();
+        });
+        
+        // Fallback timeout
+        setTimeout(() => {
+          printWindow.focus();
+          printWindow.print();
+          printWindow.close();
+        }, 1000);
+        
+        toast({
+          title: "جاري الطباعة",
+          description: "تم فتح نافذة الطباعة",
+        });
+      }
+    } catch (error) {
+      console.error('Print error:', error);
+      toast({
+        title: "خطأ في الطباعة",
+        description: "حدث خطأ أثناء تحضير المحتوى للطباعة. تأكد من السماح للنوافذ المنبثقة.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
