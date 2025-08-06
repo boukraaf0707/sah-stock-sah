@@ -4,7 +4,9 @@ export interface Product {
   nameEn?: string;
   category: string;
   quantity: number;
-  price: number;
+  buyingPrice: number;
+  sellingPrice: number;
+  price: number; // Keep for backward compatibility - will reference sellingPrice
   supplier?: string;
   image?: string;
   createdAt: Date;

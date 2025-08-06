@@ -20,7 +20,8 @@ export function ProductForm({ isOpen, onClose, onSubmit, product, title }: Produ
     nameAr: product?.nameAr || '',
     category: product?.category || '',
     quantity: product?.quantity || 0,
-    price: product?.price || 0,
+    buyingPrice: product?.buyingPrice || 0,
+    sellingPrice: product?.sellingPrice || product?.price || 0,
     supplier: product?.supplier || '',
     image: product?.image || '',
     minStock: product?.minStock || 5,
@@ -28,7 +29,8 @@ export function ProductForm({ isOpen, onClose, onSubmit, product, title }: Produ
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    // Include both prices and keep price field for backward compatibility
+    onSubmit({ ...formData, price: formData.sellingPrice });
     onClose();
   };
 
@@ -106,20 +108,37 @@ export function ProductForm({ isOpen, onClose, onSubmit, product, title }: Produ
               />
             </div>
             <div>
-              <Label htmlFor="price" className="text-right block mb-2">
-                السعر (DZD) *
+              <Label htmlFor="buyingPrice" className="text-right block mb-2">
+                سعر الشراء (من المورد) *
               </Label>
               <Input
-                id="price"
+                id="buyingPrice"
                 type="number"
                 min="0"
                 step="0.01"
                 required
-                value={formData.price}
-                onChange={(e) => setFormData(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
+                value={formData.buyingPrice}
+                onChange={(e) => setFormData(prev => ({ ...prev, buyingPrice: parseFloat(e.target.value) || 0 }))}
                 className="text-right ltr-content"
               />
             </div>
+          </div>
+
+          {/* Selling Price */}
+          <div>
+            <Label htmlFor="sellingPrice" className="text-right block mb-2">
+              سعر البيع (للعميل) *
+            </Label>
+            <Input
+              id="sellingPrice"
+              type="number"
+              min="0"
+              step="0.01"
+              required
+              value={formData.sellingPrice}
+              onChange={(e) => setFormData(prev => ({ ...prev, sellingPrice: parseFloat(e.target.value) || 0 }))}
+              className="text-right ltr-content"
+            />
           </div>
 
           {/* Min Stock */}

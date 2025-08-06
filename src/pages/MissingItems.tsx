@@ -42,7 +42,7 @@ const MissingItems = ({ products }: MissingItemsProps) => {
           reason: 'out_of_stock',
           description: 'تم الكشف تلقائياً عند نفاد المخزون',
           supplier: product.supplier,
-          estimatedPrice: product.price,
+          estimatedPrice: product.buyingPrice, // Use buying price as estimated price
           image: product.image, // Include product image
           detectedAt: new Date(),
           isResolved: false

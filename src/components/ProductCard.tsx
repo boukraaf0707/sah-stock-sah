@@ -125,14 +125,23 @@ export function ProductCard({ product, onEdit, onDelete, onUpdateQuantity, dir =
             )}
           </div>
 
-          <div className="flex items-center justify-between">
-            <span className="font-bold text-primary text-lg">
-              {product.price.toLocaleString('en-US')} DZD
-            </span>
-            {product.supplier && (
-              <span className="text-xs text-muted-foreground">
-                {product.supplier}
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">شراء:</span>
+              <span className="font-medium text-sm">
+                {(product.buyingPrice || 0).toLocaleString('en-US')} DZD
               </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">بيع:</span>
+              <span className="font-bold text-primary">
+                {(product.sellingPrice || product.price || 0).toLocaleString('en-US')} DZD
+              </span>
+            </div>
+            {product.supplier && (
+              <div className="text-xs text-muted-foreground text-center pt-1">
+                {product.supplier}
+              </div>
             )}
           </div>
         </div>

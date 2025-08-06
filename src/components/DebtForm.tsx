@@ -55,8 +55,8 @@ export const DebtForm = ({ isOpen, onClose, onSubmit, products }: DebtFormProps)
         productId: product.id,
         productName: product.nameAr,
         quantity: 1,
-        unitPrice: product.price,
-        totalPrice: product.price
+        unitPrice: product.sellingPrice || product.price,
+        totalPrice: product.sellingPrice || product.price
       };
       setFormData(prev => ({
         ...prev,
@@ -206,7 +206,7 @@ export const DebtForm = ({ isOpen, onClose, onSubmit, products }: DebtFormProps)
                         <div className="flex-1 text-right">
                           <div className="font-medium">{product.nameAr}</div>
                           <div className="text-sm text-muted-foreground">
-                            {product.price.toLocaleString('en-US')} DZD - متوفر: {product.quantity}
+                            {(product.sellingPrice || product.price).toLocaleString('en-US')} DZD - متوفر: {product.quantity}
                           </div>
                         </div>
                         <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
