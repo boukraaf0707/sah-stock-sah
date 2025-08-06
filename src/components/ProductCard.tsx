@@ -1,21 +1,40 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Product, CATEGORIES } from "@/types/product";
-import { Edit, Trash2, Package } from "lucide-react";
+import { Edit, Trash2, Package, Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 interface ProductCardProps {
   product: Product;
   onEdit: (product: Product) => void;
   onDelete: (id: string) => void;
+  onUpdateQuantity?: (id: string, quantity: number) => void;
   dir?: "rtl" | "ltr";
 }
 
-export function ProductCard({ product, onEdit, onDelete, dir = "rtl" }: ProductCardProps) {
+export function ProductCard({ product, onEdit, onDelete, onUpdateQuantity, dir = "rtl" }: ProductCardProps) {
+  const [isEditingQuantity, setIsEditingQuantity] = useState(false);
+  const [tempQuantity, setTempQuantity] = useState(product.quantity.toString());
+  
   const category = CATEGORIES.find(c => c.id === product.category);
   const isLowStock = product.quantity <= (product.minStock || 5);
   const isOutOfStock = product.quantity === 0;
+
+  const handleQuantitySubmit = () => {
+    const newQuantity = parseInt(tempQuantity);
+    if (!isNaN(newQuantity) && newQuantity >= 0 && onUpdateQuantity) {
+      onUpdateQuantity(product.id, newQuantity);
+    }
+    setIsEditingQuantity(false);
+  };
+
+  const handleQuantityCancel = () => {
+    setTempQuantity(product.quantity.toString());
+    setIsEditingQuantity(false);
+  };
 
   return (
     <Card className={cn(
@@ -70,9 +89,40 @@ export function ProductCard({ product, onEdit, onDelete, dir = "rtl" }: ProductC
             >
               {category?.nameAr || product.category}
             </Badge>
-            <span className="text-xs text-muted-foreground">
-              الكمية: {product.quantity}
-            </span>
+            {isEditingQuantity ? (
+              <div className="flex items-center gap-1">
+                <span className="text-xs text-muted-foreground">الكمية:</span>
+                <Input
+                  value={tempQuantity}
+                  onChange={(e) => setTempQuantity(e.target.value)}
+                  className="h-6 w-16 text-xs px-1"
+                  type="number"
+                  min="0"
+                />
+                <Button
+                  size="sm"
+                  onClick={handleQuantitySubmit}
+                  className="h-6 w-6 p-0"
+                >
+                  <Check className="w-3 h-3" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleQuantityCancel}
+                  className="h-6 w-6 p-0"
+                >
+                  <X className="w-3 h-3" />
+                </Button>
+              </div>
+            ) : (
+              <span 
+                className="text-xs text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+                onClick={() => onUpdateQuantity && setIsEditingQuantity(true)}
+              >
+                الكمية: {product.quantity}
+              </span>
+            )}
           </div>
 
           <div className="flex items-center justify-between">

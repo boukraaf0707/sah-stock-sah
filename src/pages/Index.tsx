@@ -85,6 +85,20 @@ const Index = ({ products, onUpdateProducts }: IndexProps) => {
     });
   };
 
+  const handleUpdateQuantity = (id: string, quantity: number) => {
+    const updatedProducts = products.map(p => 
+      p.id === id 
+        ? { ...p, quantity, updatedAt: new Date() }
+        : p
+    );
+    onUpdateProducts(updatedProducts);
+    const product = products.find(p => p.id === id);
+    toast({
+      title: "تم تحديث الكمية",
+      description: `تم تحديث كمية ${product?.nameAr || 'المنتج'} إلى ${quantity}`,
+    });
+  };
+
   const handleRestock = (product: Product) => {
     setEditingProduct(product);
     setIsFormOpen(true);
@@ -215,12 +229,13 @@ const Index = ({ products, onUpdateProducts }: IndexProps) => {
             {filteredProducts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {filteredProducts.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    onEdit={openEditForm}
-                    onDelete={handleDeleteProduct}
-                  />
+                   <ProductCard
+                     key={product.id}
+                     product={product}
+                     onEdit={openEditForm}
+                     onDelete={handleDeleteProduct}
+                     onUpdateQuantity={handleUpdateQuantity}
+                   />
                 ))}
               </div>
             ) : (
