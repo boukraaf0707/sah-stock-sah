@@ -22,14 +22,8 @@ export interface Category {
 }
 
 export const CATEGORIES: Category[] = [
-  { id: '1', nameAr: 'ضواغط التبريد', nameEn: 'Compressors', color: 'blue' },
-  { id: '2', nameAr: 'غازات التبريد', nameEn: 'Refrigerants', color: 'cyan' },
-  { id: '3', nameAr: 'أدوات السباكة', nameEn: 'Plumbing Tools', color: 'green' },
-  { id: '4', nameAr: 'أدوات كهربائية', nameEn: 'Electrical Tools', color: 'yellow' },
-  { id: '5', nameAr: 'مواسير ووصلات', nameEn: 'Pipes & Fittings', color: 'orange' },
-  { id: '6', nameAr: 'أجهزة قياس', nameEn: 'Measuring Instruments', color: 'purple' },
-  { id: '7', nameAr: 'قطع غيار تبريد', nameEn: 'HVAC Parts', color: 'indigo' },
-  { id: '8', nameAr: 'عدد يدوية', nameEn: 'Hand Tools', color: 'gray' },
-  { id: '9', nameAr: 'مواد عازلة', nameEn: 'Insulation Materials', color: 'teal' },
-  { id: '10', nameAr: 'كابلات ومفاتيح', nameEn: 'Cables & Switches', color: 'red' },
+  { id: '1', nameAr: 'كانكيري', nameEn: 'Plumbing', color: 'blue' },
+  { id: '2', nameAr: 'أرتيكل فروا شو', nameEn: 'Cold/Hot Articles', color: 'cyan' },
+  { id: '3', nameAr: 'تريسيتي', nameEn: 'Electricity', color: 'yellow' },
+  { id: '4', nameAr: 'بلومبري', nameEn: 'Plumbing Parts', color: 'green' },
 ];

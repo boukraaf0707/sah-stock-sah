@@ -71,7 +71,7 @@ export const Debts = ({ products }: DebtsProps) => {
     
     toast({
       title: "تم إضافة الدين بنجاح",
-      description: `تم تسجيل دين بقيمة ${totalAmount.toLocaleString('ar-EG')} دج لـ ${debtData.clientName}`
+      description: `تم تسجيل دين بقيمة ${totalAmount.toLocaleString('en-US')} دج لـ ${debtData.clientName}`
     });
   };
 
@@ -96,7 +96,7 @@ export const Debts = ({ products }: DebtsProps) => {
 
     toast({
       title: "تم تسجيل الدفعة بنجاح",
-      description: `تم تسجيل دفعة بقيمة ${paymentAmount.toLocaleString('ar-EG')} دج`
+      description: `تم تسجيل دفعة بقيمة ${paymentAmount.toLocaleString('en-US')} دج`
     });
   };
 
@@ -137,7 +137,7 @@ export const Debts = ({ products }: DebtsProps) => {
             <DollarSign className="h-8 w-8 text-green-600" />
             <div className="mr-4">
               <p className="text-sm font-medium text-muted-foreground">إجمالي المبلغ المستحق</p>
-              <p className="text-2xl font-bold">{stats.totalAmount.toLocaleString('ar-EG')} دج</p>
+              <p className="text-2xl font-bold">{stats.totalAmount.toLocaleString('en-US')} دج</p>
             </div>
           </CardContent>
         </Card>
@@ -185,15 +185,15 @@ export const Debts = ({ products }: DebtsProps) => {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="font-medium">إجمالي المبلغ:</span>
-                  <span>{debt.totalAmount.toLocaleString('ar-EG')} دج</span>
+                  <span>{debt.totalAmount.toLocaleString('en-US')} دج</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="font-medium">المبلغ المسدد:</span>
-                  <span className="text-green-600">{debt.paidAmount.toLocaleString('ar-EG')} دج</span>
+                  <span className="text-green-600">{debt.paidAmount.toLocaleString('en-US')} دج</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="font-medium">المبلغ المتبقي:</span>
-                  <span className="text-red-600 font-bold">{debt.remainingAmount.toLocaleString('ar-EG')} دج</span>
+                  <span className="text-red-600 font-bold">{debt.remainingAmount.toLocaleString('en-US')} دج</span>
                 </div>
                 
                 <div className="pt-2 border-t">
@@ -201,7 +201,7 @@ export const Debts = ({ products }: DebtsProps) => {
                   <div className="space-y-1">
                     {debt.items.map((item, index) => (
                       <div key={index} className="text-sm text-muted-foreground">
-                        {item.productName} × {item.quantity} = {item.totalPrice.toLocaleString('ar-EG')} دج
+                        {item.productName} × {item.quantity} = {item.totalPrice.toLocaleString('en-US')} دج
                       </div>
                     ))}
                   </div>

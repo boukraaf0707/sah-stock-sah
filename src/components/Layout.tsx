@@ -40,7 +40,7 @@ const Layout = ({ children, stats }: LayoutProps) => {
       badge: stats?.totalProducts
     },
     {
-      href: "/missing",
+      href: "/missing-items",
       label: "الأصناف المفقودة",
       icon: AlertTriangle,
       badge: stats ? stats.outOfStock + stats.missingItems : undefined,
@@ -55,6 +55,11 @@ const Layout = ({ children, stats }: LayoutProps) => {
     {
       href: "/debts",
       label: "الديون",
+      icon: CreditCard
+    },
+    {
+      href: "/abdullah",
+      label: "ما أخذ عبد الله",
       icon: CreditCard
     },
     {

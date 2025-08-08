@@ -5,8 +5,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Index from "./pages/Index";
-import MissingItems from "./pages/MissingItems";
+import MissingItemsByCategory from "./pages/MissingItemsByCategory";
 import { Debts } from "./pages/Debts";
+import { Abdullah } from "./pages/Abdullah";
 import Sales from "./pages/Sales";
 import Reports from "./pages/Reports";
 import NotFound from "./pages/NotFound";
@@ -86,9 +87,10 @@ const App = () => {
           <Layout stats={stats}>
             <Routes>
               <Route path="/" element={<Index products={products} onUpdateProducts={setProducts} />} />
-              <Route path="/missing" element={<MissingItems products={products} />} />
+              <Route path="/missing-items" element={<MissingItemsByCategory products={products} />} />
               <Route path="/sales" element={<Sales products={products} onUpdateProducts={setProducts} />} />
               <Route path="/debts" element={<Debts products={products} />} />
+              <Route path="/abdullah" element={<Abdullah products={products} />} />
               <Route path="/reports" element={<Reports products={products} missingItems={missingItems} sales={sales} onImportData={handleImportData} />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
