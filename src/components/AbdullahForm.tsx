@@ -70,12 +70,12 @@ export const AbdullahForm = ({ isOpen, onClose, onSubmit, products }: AbdullahFo
       return;
     }
 
-    const validItems = items.filter(item => item.productId && item.quantity > 0);
+    const validItems = items.filter(item => (item.productId || item.productName.trim()) && item.quantity > 0);
     
     if (validItems.length === 0) {
       toast({
         title: "خطأ",
-        description: "يرجى اختيار منتجات صحيحة وكميات أكبر من صفر",
+        description: "يرجى اختيار منتجات أو كتابة أسمائها وكميات أكبر من صفر",
         variant: "destructive"
       });
       return;
@@ -120,21 +120,32 @@ export const AbdullahForm = ({ isOpen, onClose, onSubmit, products }: AbdullahFo
                   <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
                     <div className="space-y-2">
                       <Label>المنتج</Label>
-                      <Select
-                        value={item.productId}
-                        onValueChange={(value) => handleItemChange(index, 'productId', value)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="اختر منتج" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {products.map(product => (
-                            <SelectItem key={product.id} value={product.id}>
-                              {product.nameAr} - {product.sellingPrice.toLocaleString('en-US')} دج
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <div className="space-y-2">
+                        <Select
+                          value={item.productId}
+                          onValueChange={(value) => handleItemChange(index, 'productId', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="اختر من القائمة" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {products.map(product => (
+                              <SelectItem key={product.id} value={product.id}>
+                                {product.nameAr} - {product.sellingPrice.toLocaleString('en-US')} دج
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <div className="text-center text-xs text-muted-foreground">أو</div>
+                        <Input
+                          placeholder="اكتب اسم المنتج يدوياً"
+                          value={item.productId ? "" : item.productName}
+                          onChange={(e) => {
+                            handleItemChange(index, 'productId', '');
+                            handleItemChange(index, 'productName', e.target.value);
+                          }}
+                        />
+                      </div>
                     </div>
 
                     <div className="space-y-2">
