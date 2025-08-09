@@ -159,6 +159,8 @@ const MissingItemsByCategory = ({ products }: MissingItemsByCategoryProps) => {
     };
 
     setMissingItems(prev => [...prev, newMissingItem]);
+    setIsFormOpen(false); // Close the form after adding
+    
     toast({
       title: "تم إضافة الصنف المفقود",
       description: "تم إضافة الصنف إلى قائمة المفقودات بنجاح",
