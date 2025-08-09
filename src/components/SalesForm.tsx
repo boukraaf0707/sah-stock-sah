@@ -30,6 +30,7 @@ export const SalesForm = ({ isOpen, onClose, onSubmit, products }: SalesFormProp
 
   // Filter available products (only in stock)
   const availableProducts = useMemo(() => {
+    if (!searchTerm) return [];
     return products.filter(p => p.quantity > 0 && 
       p.nameAr.toLowerCase().includes(searchTerm.toLowerCase())
     );

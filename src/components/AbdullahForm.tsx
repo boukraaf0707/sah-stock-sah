@@ -100,7 +100,7 @@ export const AbdullahForm = ({ isOpen, onClose, onSubmit, products }: AbdullahFo
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" dir="rtl">
         <DialogHeader>
-          <DialogTitle>تسجيل ما أخذ عبد الله</DialogTitle>
+          <DialogTitle>تسجيل ما أخذ بوكراع وعبد الله</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">

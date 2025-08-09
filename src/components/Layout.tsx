@@ -59,7 +59,7 @@ const Layout = ({ children, stats }: LayoutProps) => {
     },
     {
       href: "/abdullah",
-      label: "ما أخذ عبد الله",
+      label: "ما أخذ بوكراع وعبد الله",
       icon: CreditCard
     },
     {

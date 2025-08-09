@@ -9,8 +9,9 @@ import { MissingItemCard } from "@/components/MissingItemCard";
 import { MissingItemFormComponent } from "@/components/MissingItemForm";
 import { MissingItem, MissingItemForm as MissingItemFormType } from "@/types/missing";
 import { Product, CATEGORIES } from "@/types/product";
-import { Plus, Search, Filter } from "lucide-react";
+import { Plus, Search, Filter, Printer } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { localStorageUtils } from "@/utils/localStorage";
 
 interface MissingItemsByCategoryProps {
   products: Product[];
@@ -24,10 +25,30 @@ const MissingItemsByCategory = ({ products }: MissingItemsByCategoryProps) => {
   const [activeCategory, setActiveCategory] = useState(CATEGORIES[0]?.nameAr || '');
   const [isFormOpen, setIsFormOpen] = useState(false);
 
+  // Load missing items from localStorage on mount
+  useEffect(() => {
+    const loadMissingItems = async () => {
+      const savedItems = await localStorageUtils.loadMissingItems();
+      setMissingItems(savedItems);
+    };
+    loadMissingItems();
+  }, []);
+
+  // Save missing items to localStorage whenever they change
+  useEffect(() => {
+    if (missingItems.length >= 0) {
+      localStorageUtils.saveMissingItems(missingItems);
+    }
+  }, [missingItems]);
+
   // Auto-detect out of stock items
   useEffect(() => {
+    if (products.length === 0 || missingItems.length === 0) return;
+    
     const outOfStockProducts = products.filter(p => p.quantity === 0);
     const existingMissingIds = missingItems.map(m => m.productId).filter(Boolean);
+    
+    const newMissingItems: MissingItem[] = [];
     
     outOfStockProducts.forEach(product => {
       if (!existingMissingIds.includes(product.id)) {
@@ -46,11 +67,14 @@ const MissingItemsByCategory = ({ products }: MissingItemsByCategoryProps) => {
           detectedAt: new Date(),
           isResolved: false
         };
-        
-        setMissingItems(prev => [...prev, newMissingItem]);
+        newMissingItems.push(newMissingItem);
       }
     });
-  }, [products, missingItems]);
+    
+    if (newMissingItems.length > 0) {
+      setMissingItems(prev => [...prev, ...newMissingItems]);
+    }
+  }, [products]);
 
   // Filter missing items by active category
   const filteredItems = useMemo(() => {
@@ -147,6 +171,49 @@ const MissingItemsByCategory = ({ products }: MissingItemsByCategoryProps) => {
     setSelectedReason('');
   };
 
+  const handlePrint = () => {
+    const printContent = `
+      <html dir="rtl">
+        <head>
+          <title>الأصناف المفقودة - ${activeCategory}</title>
+          <style>
+            body { font-family: Arial, sans-serif; direction: rtl; }
+            .header { text-align: center; margin-bottom: 20px; }
+            .category { background: #f5f5f5; padding: 10px; margin: 10px 0; }
+            .item { border: 1px solid #ddd; padding: 10px; margin: 5px 0; }
+            .priority-urgent { background: #fee; }
+            .priority-high { background: #fef0e6; }
+            .priority-medium { background: #fff9e6; }
+            .priority-low { background: #f0f9ff; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>الأصناف المفقودة - ${activeCategory}</h1>
+            <p>تاريخ الطباعة: ${new Date().toLocaleDateString('ar-DZ')}</p>
+          </div>
+          ${filteredItems.map(item => `
+            <div class="item priority-${item.priority}">
+              <h3>${item.nameAr} ${item.nameEn ? `(${item.nameEn})` : ''}</h3>
+              <p><strong>الأولوية:</strong> ${item.priority === 'urgent' ? 'عاجلة' : item.priority === 'high' ? 'عالية' : item.priority === 'medium' ? 'متوسطة' : 'منخفضة'}</p>
+              <p><strong>السبب:</strong> ${item.reason === 'out_of_stock' ? 'نفاد المخزون' : item.reason === 'damaged' ? 'تالف' : item.reason === 'lost' ? 'مفقود' : 'أخرى'}</p>
+              ${item.description ? `<p><strong>الوصف:</strong> ${item.description}</p>` : ''}
+              ${item.estimatedPrice ? `<p><strong>السعر المتوقع:</strong> ${item.estimatedPrice.toLocaleString('en-US')} دج</p>` : ''}
+              <p><strong>تاريخ الاكتشاف:</strong> ${item.detectedAt.toLocaleDateString('ar-DZ')}</p>
+            </div>
+          `).join('')}
+        </body>
+      </html>
+    `;
+    
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(printContent);
+      printWindow.document.close();
+      printWindow.print();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background" dir="rtl">
       <div className="container mx-auto p-4 space-y-6">
@@ -160,10 +227,16 @@ const MissingItemsByCategory = ({ products }: MissingItemsByCategoryProps) => {
               تتبع وإدارة الأصناف المفقودة مقسمة حسب فئات المنتجات
             </p>
           </div>
-          <Button onClick={() => setIsFormOpen(true)} className="bg-gradient-primary">
-            <Plus className="w-4 h-4 ml-2" />
-            إضافة صنف مفقود
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={() => setIsFormOpen(true)} className="bg-gradient-primary">
+              <Plus className="w-4 h-4 ml-2" />
+              إضافة صنف مفقود
+            </Button>
+            <Button onClick={handlePrint} variant="outline">
+              <Printer className="w-4 h-4 ml-2" />
+              طباعة
+            </Button>
+          </div>
         </div>
 
         {/* Category Statistics */}

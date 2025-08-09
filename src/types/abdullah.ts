@@ -8,6 +8,7 @@ export interface Abdullah {
   updatedAt: Date;
   isPaid: boolean;
   notes?: string;
+  balanceType?: 'abdullah_owes' | 'bokrae_owes' | 'balanced'; // Who owes whom
 }
 
 export interface AbdullahItem {

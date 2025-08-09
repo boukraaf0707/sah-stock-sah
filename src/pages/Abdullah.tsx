@@ -52,6 +52,20 @@ export const Abdullah = ({ products }: AbdullahProps) => {
   const handleAddRecord = (formData: AbdullahFormType) => {
     const totalAmount = formData.items.reduce((sum, item) => sum + item.totalPrice, 0);
     
+    // Calculate balance based on all previous entries
+    const totalPreviousBalance = abdullahs.reduce((sum, entry) => {
+      return sum + entry.remainingAmount;
+    }, 0);
+    
+    const newBalance = totalPreviousBalance + totalAmount;
+    let balanceType: 'abdullah_owes' | 'bokrae_owes' | 'balanced' = 'balanced';
+    
+    if (newBalance > 0) {
+      balanceType = 'abdullah_owes';
+    } else if (newBalance < 0) {
+      balanceType = 'bokrae_owes';
+    }
+    
     const newAbdullah: AbdullahType = {
       id: Date.now().toString(),
       items: formData.items,
@@ -61,14 +75,15 @@ export const Abdullah = ({ products }: AbdullahProps) => {
       createdAt: new Date(),
       updatedAt: new Date(),
       isPaid: false,
-      notes: formData.notes
+      notes: formData.notes,
+      balanceType
     };
 
     setAbdullahs(prev => [newAbdullah, ...prev]);
     
     toast({
       title: "تم تسجيل السجل بنجاح",
-      description: `تم تسجيل سجل بقيمة ${totalAmount.toLocaleString('en-US')} دج لعبد الله`
+      description: `تم تسجيل سجل بقيمة ${totalAmount.toLocaleString('en-US')} دج لبوكراع وعبد الله`
     });
   };
 
@@ -106,19 +121,19 @@ export const Abdullah = ({ products }: AbdullahProps) => {
     <div className="space-y-6" dir="rtl">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold">ما أخذ عبد الله</h1>
+          <h1 className="text-3xl font-bold">ما أخذ بوكراع وعبد الله</h1>
           <p className="text-muted-foreground">
-            تتبع وإدارة ما أخذه عبد الله من المنتجات
+            تتبع وإدارة ما أخذه بوكراع وعبد الله من المنتجات والحسابات المتبادلة
           </p>
         </div>
         <Button onClick={() => setIsFormOpen(true)} className="w-full sm:w-auto">
           <Plus className="w-4 h-4 ml-2" />
-          تسجيل جديد
+          تسجيل ما أخذ بوكراع وعبد الله
         </Button>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="flex items-center p-6">
             <Receipt className="h-8 w-8 text-blue-600" />
@@ -134,7 +149,7 @@ export const Abdullah = ({ products }: AbdullahProps) => {
             <DollarSign className="h-8 w-8 text-green-600" />
             <div className="mr-4">
               <p className="text-sm font-medium text-muted-foreground">إجمالي المبلغ المستحق</p>
-              <p className="text-2xl font-bold">{stats.totalAmount.toLocaleString('en-US')} دج</p>
+              <p className="text-2xl font-bold">{Math.abs(stats.totalAmount).toLocaleString('en-US')} دج</p>
             </div>
           </CardContent>
         </Card>
@@ -145,6 +160,24 @@ export const Abdullah = ({ products }: AbdullahProps) => {
             <div className="mr-4">
               <p className="text-sm font-medium text-muted-foreground">عدد المنتجات</p>
               <p className="text-2xl font-bold">{stats.totalItems}</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="flex items-center p-6">
+            <div className="flex flex-col items-center">
+              <p className="text-sm font-medium text-muted-foreground mb-2">حالة الحساب</p>
+              <div className={`text-lg font-bold text-center ${
+                stats.totalAmount > 0 ? 'text-destructive' : stats.totalAmount < 0 ? 'text-green-600' : 'text-muted-foreground'
+              }`}>
+                {stats.totalAmount > 0 
+                  ? `عبد الله يدين ${Math.abs(stats.totalAmount).toLocaleString('en-US')} دج`
+                  : stats.totalAmount < 0 
+                  ? `بوكراع يدين ${Math.abs(stats.totalAmount).toLocaleString('en-US')} دج`
+                  : 'متوازن'
+                }
+              </div>
             </div>
           </CardContent>
         </Card>
