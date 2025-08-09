@@ -158,12 +158,26 @@ const MissingItemsByCategory = ({ products }: MissingItemsByCategoryProps) => {
       isResolved: false
     };
 
-    setMissingItems(prev => [...prev, newMissingItem]);
+    console.log('Adding missing item:', newMissingItem);
+    console.log('Current active category:', activeCategory);
+    console.log('Item category:', formData.category);
+
+    setMissingItems(prev => {
+      const updated = [...prev, newMissingItem];
+      console.log('Updated missing items:', updated);
+      return updated;
+    });
+    
+    // Switch to the category of the newly added item if it's different
+    if (formData.category !== activeCategory) {
+      setActiveCategory(formData.category);
+    }
+    
     setIsFormOpen(false); // Close the form after adding
     
     toast({
       title: "تم إضافة الصنف المفقود",
-      description: "تم إضافة الصنف إلى قائمة المفقودات بنجاح",
+      description: `تم إضافة الصنف إلى قائمة المفقودات في فئة "${formData.category}"`,
     });
   };
 
