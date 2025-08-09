@@ -255,37 +255,47 @@ const MissingItemsByCategory = ({ products }: MissingItemsByCategoryProps) => {
           </div>
         </div>
 
-        {/* Category Statistics */}
+        {/* Category Statistics - Organized by the 4 product types */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {categoryStats.map(stat => (
-            <Card 
-              key={stat.category} 
-              className={`cursor-pointer transition-all ${
-                activeCategory === stat.category 
-                  ? 'ring-2 ring-primary bg-primary/5' 
-                  : 'hover:shadow-md'
-              }`}
-              onClick={() => setActiveCategory(stat.category)}
-            >
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-right">{stat.category}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-1">
-                <div className="flex justify-between text-sm">
-                  <span>المجموع:</span>
-                  <span className="font-bold">{stat.total}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>غير محلولة:</span>
-                  <span className="font-bold text-warning">{stat.unresolved}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>عاجلة:</span>
-                  <span className="font-bold text-destructive">{stat.urgent}</span>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+          {CATEGORIES.map(category => {
+            const stat = categoryStats.find(s => s.category === category.nameAr) || {
+              category: category.nameAr,
+              total: 0,
+              unresolved: 0,
+              urgent: 0
+            };
+            
+            return (
+              <Card 
+                key={category.nameAr} 
+                className={`cursor-pointer transition-all ${
+                  activeCategory === category.nameAr 
+                    ? 'ring-2 ring-primary bg-primary/5' 
+                    : 'hover:shadow-md'
+                }`}
+                onClick={() => setActiveCategory(category.nameAr)}
+              >
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-right">{category.nameAr}</CardTitle>
+                  <p className="text-xs text-muted-foreground text-right">{category.nameEn}</p>
+                </CardHeader>
+                <CardContent className="space-y-1">
+                  <div className="flex justify-between text-sm">
+                    <span>المجموع:</span>
+                    <span className="font-bold">{stat.total}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>غير محلولة:</span>
+                    <span className="font-bold text-warning">{stat.unresolved}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>عاجلة:</span>
+                    <span className="font-bold text-destructive">{stat.urgent}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
         {/* Filters */}
