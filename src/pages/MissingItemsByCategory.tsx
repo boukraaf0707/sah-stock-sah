@@ -46,40 +46,18 @@ const MissingItemsByCategory = ({ products }: MissingItemsByCategoryProps) => {
     }
   }, [missingItems]);
 
-  // Auto-detect out of stock items
+  // Sync missing items whenever products change (App handles auto-add on stock changes)
   useEffect(() => {
-    if (products.length === 0) return;
-    
-    const outOfStockProducts = products.filter(p => p.quantity === 0);
-    const existingMissingIds = missingItems.map(m => m.productId).filter(Boolean);
-    
-    const newMissingItems: MissingItem[] = [];
-    
-    outOfStockProducts.forEach(product => {
-      if (!existingMissingIds.includes(product.id)) {
-        const newMissingItem: MissingItem = {
-          id: `auto-${product.id}-${Date.now()}`,
-          productId: product.id,
-          nameAr: product.nameAr,
-          nameEn: product.nameEn,
-          category: (CATEGORIES.find(c => c.id === product.category)?.nameAr) || product.category,
-          priority: 'medium',
-          reason: 'out_of_stock',
-          description: 'تم الكشف تلقائياً عند نفاد المخزون',
-          supplier: product.supplier,
-          estimatedPrice: product.buyingPrice,
-          image: product.image,
-          detectedAt: new Date(),
-          isResolved: false
-        };
-        newMissingItems.push(newMissingItem);
-      }
-    });
-    
-    if (newMissingItems.length > 0) {
-      setMissingItems(prev => [...prev, ...newMissingItems]);
-    }
-  }, [products, missingItems]);
+    const syncMissingItems = async () => {
+      const savedItems = await localStorageUtils.loadMissingItems();
+      const normalized = savedItems.map(item => {
+        const match = CATEGORIES.find(c => c.id === item.category);
+        return match ? { ...item, category: match.nameAr } : item;
+      });
+      setMissingItems(normalized);
+    };
+    syncMissingItems();
+  }, [products]);
 
   // Filter missing items by active category
   const filteredItems = useMemo(() => {

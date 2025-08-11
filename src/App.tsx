@@ -12,7 +12,7 @@ import Sales from "./pages/Sales";
 import Reports from "./pages/Reports";
 import NotFound from "./pages/NotFound";
 import Layout from "@/components/Layout";
-import { Product } from "@/types/product";
+import { Product, CATEGORIES } from "@/types/product";
 import { MissingItem } from "@/types/missing";
 import { Sale } from "@/types/sale";
 import { localStorageUtils } from "@/utils/localStorage";
@@ -64,6 +64,40 @@ const App = () => {
     }
   }, [missingItems]);
 
+  // Auto-create missing items when products hit quantity 0
+  useEffect(() => {
+    if (!Array.isArray(products) || products.length === 0) return;
+
+    setMissingItems((prev) => {
+      const existing = new Set(
+        prev.filter((mi) => !mi.isResolved && mi.productId).map((mi) => mi.productId as string)
+      );
+
+      const toAdd: MissingItem[] = [];
+      for (const p of products) {
+        if (p.quantity === 0 && !existing.has(p.id)) {
+          toAdd.push({
+            id: `auto-${p.id}-${Date.now()}`,
+            productId: p.id,
+            nameAr: p.nameAr,
+            nameEn: p.nameEn,
+            category: (CATEGORIES.find((c) => c.id === p.category)?.nameAr) || p.category,
+            priority: 'medium',
+            reason: 'out_of_stock',
+            description: 'تمت الإضافة تلقائياً عند نفاد المخزون',
+            supplier: p.supplier,
+            estimatedPrice: p.buyingPrice,
+            image: p.image,
+            detectedAt: new Date(),
+            isResolved: false,
+          });
+        }
+      }
+
+      return toAdd.length ? [...prev, ...toAdd] : prev;
+    });
+  }, [products]);
+
   const stats = {
     totalProducts: Array.isArray(products) ? products.length : 0,
     outOfStock: Array.isArray(products) ? products.filter(p => p.quantity === 0).length : 0,
@@ -71,7 +105,6 @@ const App = () => {
     totalSales: Array.isArray(sales) ? sales.length : 0,
     missingItems: Array.isArray(missingItems) ? missingItems.filter(m => !m.isResolved).length : 0
   };
-
   const handleImportData = (data: { products?: Product[]; missingItems?: MissingItem[]; sales?: Sale[] }) => {
     if (data.products) setProducts(data.products);
     if (data.missingItems) setMissingItems(data.missingItems);
