@@ -29,7 +29,12 @@ const MissingItemsByCategory = ({ products }: MissingItemsByCategoryProps) => {
   useEffect(() => {
     const loadMissingItems = async () => {
       const savedItems = await localStorageUtils.loadMissingItems();
-      setMissingItems(savedItems);
+      // Normalize category to Arabic name if stored as ID
+      const normalized = savedItems.map(item => {
+        const match = CATEGORIES.find(c => c.id === item.category);
+        return match ? { ...item, category: match.nameAr } : item;
+      });
+      setMissingItems(normalized);
     };
     loadMissingItems();
   }, []);
@@ -43,7 +48,7 @@ const MissingItemsByCategory = ({ products }: MissingItemsByCategoryProps) => {
 
   // Auto-detect out of stock items
   useEffect(() => {
-    if (products.length === 0 || missingItems.length === 0) return;
+    if (products.length === 0) return;
     
     const outOfStockProducts = products.filter(p => p.quantity === 0);
     const existingMissingIds = missingItems.map(m => m.productId).filter(Boolean);
@@ -57,7 +62,7 @@ const MissingItemsByCategory = ({ products }: MissingItemsByCategoryProps) => {
           productId: product.id,
           nameAr: product.nameAr,
           nameEn: product.nameEn,
-          category: product.category,
+          category: (CATEGORIES.find(c => c.id === product.category)?.nameAr) || product.category,
           priority: 'medium',
           reason: 'out_of_stock',
           description: 'تم الكشف تلقائياً عند نفاد المخزون',
@@ -74,7 +79,7 @@ const MissingItemsByCategory = ({ products }: MissingItemsByCategoryProps) => {
     if (newMissingItems.length > 0) {
       setMissingItems(prev => [...prev, ...newMissingItems]);
     }
-  }, [products]);
+  }, [products, missingItems]);
 
   // Filter missing items by active category
   const filteredItems = useMemo(() => {

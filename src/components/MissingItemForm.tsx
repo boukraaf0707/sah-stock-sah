@@ -117,7 +117,7 @@ export const MissingItemFormComponent = ({
                 </SelectTrigger>
                 <SelectContent>
                   {CATEGORIES.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
+                    <SelectItem key={category.id} value={category.nameAr}>
                       {category.nameAr}
                     </SelectItem>
                   ))}
