@@ -1,5 +1,8 @@
+export type Person = 'abdullah' | 'bokrae';
+
 export interface Abdullah {
   id: string;
+  person: Person;
   items: AbdullahItem[];
   totalAmount: number;
   paidAmount: number;
@@ -20,6 +23,7 @@ export interface AbdullahItem {
 }
 
 export interface AbdullahForm {
+  person: Person;
   items: AbdullahItem[];
   notes?: string;
 }

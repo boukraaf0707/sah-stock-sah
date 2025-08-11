@@ -17,6 +17,7 @@ interface AbdullahPaymentDialogProps {
 export const AbdullahPaymentDialog = ({ isOpen, onClose, abdullah, onPayment }: AbdullahPaymentDialogProps) => {
   const [amount, setAmount] = useState<string>("");
   const [notes, setNotes] = useState("");
+  const personLabel = abdullah.person === 'bokrae' ? 'بوكراع' : 'عبد الله';
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +60,7 @@ export const AbdullahPaymentDialog = ({ isOpen, onClose, abdullah, onPayment }: 
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-md" dir="rtl">
         <DialogHeader>
-          <DialogTitle>تسجيل دفعة من عبد الله</DialogTitle>
+          <DialogTitle>تسجيل دفعة من {personLabel}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">

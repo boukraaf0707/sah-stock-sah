@@ -21,6 +21,7 @@ interface AbdullahFormProps {
 export const AbdullahForm = ({ isOpen, onClose, onSubmit, products }: AbdullahFormProps) => {
   const [items, setItems] = useState<AbdullahItem[]>([]);
   const [notes, setNotes] = useState("");
+  const [person, setPerson] = useState<'abdullah' | 'bokrae'>("abdullah");
 
   const handleAddItem = () => {
     setItems(prev => [...prev, {
@@ -82,6 +83,7 @@ export const AbdullahForm = ({ isOpen, onClose, onSubmit, products }: AbdullahFo
     }
 
     onSubmit({
+      person,
       items: validItems,
       notes: notes.trim() || undefined
     });
@@ -104,6 +106,20 @@ export const AbdullahForm = ({ isOpen, onClose, onSubmit, products }: AbdullahFo
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Person Selector */}
+          <div className="space-y-2">
+            <Label>من أخذ؟</Label>
+            <Select value={person} onValueChange={(value: any) => setPerson(value)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="abdullah">عبد الله</SelectItem>
+                <SelectItem value="bokrae">بوكراع</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Items Section */}
           <div className="space-y-4">
             <div className="flex justify-between items-center">
